@@ -14,7 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      portfolios: {
+        Row: {
+          artefak_data: Json | null
+          created_at: string
+          id: string
+          lampiran_data: Json | null
+          model_guru_data: Json | null
+          profile_data: Json | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          artefak_data?: Json | null
+          created_at?: string
+          id?: string
+          lampiran_data?: Json | null
+          model_guru_data?: Json | null
+          profile_data?: Json | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          artefak_data?: Json | null
+          created_at?: string
+          id?: string
+          lampiran_data?: Json | null
+          model_guru_data?: Json | null
+          profile_data?: Json | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
