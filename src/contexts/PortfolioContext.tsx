@@ -79,10 +79,10 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     try {
       await supabase.from('portfolios').upsert({
         user_id: user.id,
-        profile_data: newData.profile,
-        artefak_data: newData.artefak,
-        model_guru_data: newData.model_guru,
-        lampiran_data: newData.lampiran,
+        profile_data: newData.profile as any,
+        artefak_data: newData.artefak as any,
+        model_guru_data: newData.model_guru as any,
+        lampiran_data: newData.lampiran as any,
         updated_at: new Date().toISOString(),
       }, { onConflict: 'user_id' });
     } catch {
@@ -98,10 +98,10 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     const { data: row } = await supabase.from('portfolios').select('*').eq('user_id', id).maybeSingle();
     if (row) {
       const loaded: PortfolioData = {
-        profile: row.profile_data || defaultPortfolio.profile,
-        artefak: row.artefak_data || defaultPortfolio.artefak,
-        model_guru: row.model_guru_data || defaultPortfolio.model_guru,
-        lampiran: row.lampiran_data || defaultPortfolio.lampiran,
+        profile: (row.profile_data as any) || defaultPortfolio.profile,
+        artefak: (row.artefak_data as any) || defaultPortfolio.artefak,
+        model_guru: (row.model_guru_data as any) || defaultPortfolio.model_guru,
+        lampiran: (row.lampiran_data as any) || defaultPortfolio.lampiran,
       };
       if (!userId || userId === user?.id) setData(loaded);
       return loaded;

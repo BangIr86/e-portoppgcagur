@@ -22,10 +22,10 @@ const PublicPortfolio = () => {
       const { data: row } = await supabase.from('portfolios').select('*').eq('user_id', userId).maybeSingle();
       if (row) {
         setData({
-          profile: row.profile_data || defaultPortfolio.profile,
-          artefak: row.artefak_data || defaultPortfolio.artefak,
-          model_guru: row.model_guru_data || defaultPortfolio.model_guru,
-          lampiran: row.lampiran_data || defaultPortfolio.lampiran,
+        profile: (row.profile_data as any) || defaultPortfolio.profile,
+        artefak: (row.artefak_data as any) || defaultPortfolio.artefak,
+        model_guru: (row.model_guru_data as any) || defaultPortfolio.model_guru,
+        lampiran: (row.lampiran_data as any) || defaultPortfolio.lampiran,
         });
       }
       setLoading(false);
