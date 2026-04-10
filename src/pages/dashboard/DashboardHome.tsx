@@ -5,6 +5,9 @@ import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { User, BookOpen, Paperclip, Star, Eye, AlertCircle, ExternalLink } from 'lucide-react';
+import PageTransition from '@/components/PageTransition';
+import ShareDialog from '@/components/ShareDialog';
+import { motion } from 'framer-motion';
 
 const sections = [
   { title: 'Profil Mahasiswa', icon: User, path: '/dashboard/profil', desc: 'Data diri dan cerita inspirasi' },
@@ -26,7 +29,8 @@ const DashboardHome = () => {
   if (data.lampiran.length === 0) incomplete.push('Lampiran');
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6 fade-in">
+    <PageTransition>
+    <div className="max-w-4xl mx-auto space-y-6">
       <div>
         <h1 className="text-xl sm:text-2xl font-bold text-foreground break-words">Selamat datang, {name}!</h1>
         <p className="text-muted-foreground">Kelola e-portfolio PPG Prajabatan Anda.</p>
@@ -59,20 +63,27 @@ const DashboardHome = () => {
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {sections.map(s => (
-          <Link to={s.path} key={s.path}>
-            <Card className="card-shadow hover:card-shadow-hover transition-shadow cursor-pointer group">
-              <CardContent className="pt-6 flex items-start gap-4">
-                <div className="w-10 h-10 rounded-lg hero-gradient flex items-center justify-center shrink-0">
-                  <s.icon className="w-5 h-5 text-primary-foreground" />
-                </div>
-                <div>
-                  <h3 className="font-medium text-foreground group-hover:text-primary transition-colors">{s.title}</h3>
-                  <p className="text-sm text-muted-foreground">{s.desc}</p>
-                </div>
-              </CardContent>
-            </Card>
-          </Link>
+        {sections.map((s, i) => (
+          <motion.div
+            key={s.path}
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 + i * 0.08, duration: 0.4 }}
+          >
+            <Link to={s.path}>
+              <Card className="card-shadow hover:card-shadow-hover transition-all duration-300 cursor-pointer group hover:-translate-y-0.5">
+                <CardContent className="pt-6 flex items-start gap-4">
+                  <div className="w-10 h-10 rounded-lg hero-gradient flex items-center justify-center shrink-0">
+                    <s.icon className="w-5 h-5 text-primary-foreground" />
+                  </div>
+                  <div>
+                    <h3 className="font-medium text-foreground group-hover:text-primary transition-colors">{s.title}</h3>
+                    <p className="text-sm text-muted-foreground">{s.desc}</p>
+                  </div>
+                </CardContent>
+              </Card>
+            </Link>
+          </motion.div>
         ))}
       </div>
 
@@ -89,8 +100,10 @@ const DashboardHome = () => {
             Lihat Halaman Publik
           </Button>
         </Link>
+        {user && <ShareDialog userId={user.id} />}
       </div>
     </div>
+    </PageTransition>
   );
 };
 

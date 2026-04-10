@@ -1,3 +1,4 @@
+import PageTransition from '@/components/PageTransition';
 import { usePortfolio } from '@/contexts/PortfolioContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { Input } from '@/components/ui/input';
@@ -28,7 +29,8 @@ const ProfilForm = () => {
   };
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6 fade-in">
+    <PageTransition>
+    <div className="max-w-3xl mx-auto space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-foreground">Profil Mahasiswa</h1>
         <p className="text-muted-foreground">Data diri dan cerita inspirasi Anda. Perubahan tersimpan otomatis.</p>
@@ -86,6 +88,7 @@ const ProfilForm = () => {
         </CardContent>
       </Card>
     </div>
+    </PageTransition>
   );
 };
 
