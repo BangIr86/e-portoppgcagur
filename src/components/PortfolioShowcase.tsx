@@ -107,7 +107,6 @@ const PortfolioShowcase = ({ data }: Props) => {
                 </div>
               </motion.div>
             ))}
-          </div>
           </motion.div>
       </section>
 
