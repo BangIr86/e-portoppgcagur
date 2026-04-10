@@ -17,7 +17,7 @@ const PortfolioShowcase = ({ data }: Props) => {
   const [expandedCard, setExpandedCard] = useState<string | null>(null);
 
   return (
-    <div className="min-h-screen bg-background overflow-x-hidden">
+    <div className="min-h-screen bg-background w-full max-w-full overflow-hidden">
       {/* HERO */}
       <section className="showcase-hero text-primary-foreground py-12 sm:py-20 px-4 sm:px-6">
         <div className="max-w-4xl mx-auto text-center">
