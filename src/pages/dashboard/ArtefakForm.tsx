@@ -1,3 +1,4 @@
+import PageTransition from '@/components/PageTransition';
 import { usePortfolio } from '@/contexts/PortfolioContext';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
@@ -15,7 +16,8 @@ const ArtefakForm = () => {
   const { data, updateArtefak } = usePortfolio();
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6 fade-in">
+    <PageTransition>
+    <div className="max-w-3xl mx-auto space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-foreground">Analisis Artefak Pembelajaran</h1>
         <p className="text-muted-foreground">Refleksi dan analisis dari pengalaman mengajar Anda.</p>
@@ -45,6 +47,7 @@ const ArtefakForm = () => {
         </Card>
       ))}
     </div>
+    </PageTransition>
   );
 };
 

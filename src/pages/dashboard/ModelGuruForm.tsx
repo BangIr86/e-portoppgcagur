@@ -1,3 +1,4 @@
+import PageTransition from '@/components/PageTransition';
 import { usePortfolio } from '@/contexts/PortfolioContext';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -42,7 +43,8 @@ const ModelGuruForm = () => {
   };
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6 fade-in">
+    <PageTransition>
+    <div className="max-w-3xl mx-auto space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-foreground">Model Guru yang Dituju</h1>
         <p className="text-muted-foreground">Gambaran guru ideal yang ingin Anda capai.</p>
@@ -102,6 +104,7 @@ const ModelGuruForm = () => {
         </CardContent>
       </Card>
     </div>
+    </PageTransition>
   );
 };
 
