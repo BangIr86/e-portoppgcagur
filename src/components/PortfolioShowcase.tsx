@@ -17,23 +17,23 @@ const PortfolioShowcase = ({ data }: Props) => {
   const [expandedCard, setExpandedCard] = useState<string | null>(null);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background overflow-x-hidden">
       {/* HERO */}
-      <section className="showcase-hero text-primary-foreground py-20 px-6">
+      <section className="showcase-hero text-primary-foreground py-12 sm:py-20 px-4 sm:px-6">
         <div className="max-w-4xl mx-auto text-center">
           <motion.div initial="hidden" animate="visible" variants={fadeUp} transition={{ duration: 0.6 }}>
             {p.foto_url && (
-              <img src={p.foto_url} alt={p.full_name} className="w-28 h-28 rounded-full mx-auto mb-6 border-4 border-primary-foreground/30 object-cover" />
+              <img src={p.foto_url} alt={p.full_name} className="w-20 h-20 sm:w-28 sm:h-28 rounded-full mx-auto mb-4 sm:mb-6 border-4 border-primary-foreground/30 object-cover" />
             )}
-            <p className="text-sm uppercase tracking-widest opacity-80 mb-2">Mahasiswa PPG Prajabatan</p>
-            <h1 className="text-4xl md:text-5xl font-bold mb-3">{p.full_name || 'Nama Mahasiswa'}</h1>
-            <p className="opacity-80 mb-6">{p.asal_daerah && `${p.asal_daerah} • `}{p.asal_kampus} • {p.bidang_studi}</p>
+            <p className="text-xs sm:text-sm uppercase tracking-widest opacity-80 mb-2">Mahasiswa PPG Prajabatan</p>
+            <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold mb-3 break-words">{p.full_name || 'Nama Mahasiswa'}</h1>
+            <p className="opacity-80 mb-4 sm:mb-6 text-sm sm:text-base break-words">{p.asal_daerah && `${p.asal_daerah} • `}{p.asal_kampus} • {p.bidang_studi}</p>
             {p.kutipan_motivasi && (
-              <blockquote className="text-xl md:text-2xl italic font-light max-w-2xl mx-auto leading-relaxed opacity-90">
+              <blockquote className="text-base sm:text-xl md:text-2xl italic font-light max-w-2xl mx-auto leading-relaxed opacity-90 break-words">
                 "{p.kutipan_motivasi}"
               </blockquote>
             )}
-            <a href="#profil" className="inline-flex items-center gap-2 mt-8 px-6 py-3 rounded-full bg-primary-foreground/20 hover:bg-primary-foreground/30 transition-colors text-sm font-medium">
+            <a href="#profil" className="inline-flex items-center gap-2 mt-6 sm:mt-8 px-6 py-3 rounded-full bg-primary-foreground/20 hover:bg-primary-foreground/30 transition-colors text-sm font-medium">
               Lihat Portofolio <ChevronDown className="w-4 h-4" />
             </a>
           </motion.div>
@@ -41,10 +41,10 @@ const PortfolioShowcase = ({ data }: Props) => {
       </section>
 
       {/* PROFIL / STORY */}
-      <section id="profil" className="py-16 px-6">
+      <section id="profil" className="py-10 sm:py-16 px-4 sm:px-6">
         <div className="max-w-5xl mx-auto">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} transition={{ duration: 0.6 }}>
-            <h2 className="text-3xl font-bold text-foreground mb-10 text-center">Profil & Cerita Saya</h2>
+            <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-6 sm:mb-10 text-center">Profil & Cerita Saya</h2>
           </motion.div>
           <div className="grid md:grid-cols-2 gap-10">
             <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} transition={{ duration: 0.6, delay: 0.1 }} className="space-y-6">
@@ -78,10 +78,10 @@ const PortfolioShowcase = ({ data }: Props) => {
       </section>
 
       {/* ARTEFAK */}
-      <section className="py-16 px-6 bg-muted/30">
+      <section className="py-10 sm:py-16 px-4 sm:px-6 bg-muted/30">
         <div className="max-w-5xl mx-auto">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
-            <h2 className="text-3xl font-bold text-foreground mb-10 text-center">Analisis Artefak Pembelajaran</h2>
+            <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-6 sm:mb-10 text-center">Analisis Artefak Pembelajaran</h2>
           </motion.div>
           <div className="grid md:grid-cols-2 gap-6">
             {[
@@ -112,10 +112,10 @@ const PortfolioShowcase = ({ data }: Props) => {
 
       {/* LAMPIRAN */}
       {data.lampiran.length > 0 && (
-        <section className="py-16 px-6">
+        <section className="py-10 sm:py-16 px-4 sm:px-6">
           <div className="max-w-5xl mx-auto">
             <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
-              <h2 className="text-3xl font-bold text-foreground mb-10 text-center">Lampiran Penilaian</h2>
+              <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-6 sm:mb-10 text-center">Lampiran Penilaian</h2>
             </motion.div>
             <div className="grid md:grid-cols-2 gap-8">
               {['lampiran_7', 'lampiran_8'].map(tipe => {
@@ -144,10 +144,10 @@ const PortfolioShowcase = ({ data }: Props) => {
       )}
 
       {/* MODEL GURU */}
-      <section className="py-16 px-6 bg-muted/30">
+      <section className="py-10 sm:py-16 px-4 sm:px-6 bg-muted/30">
         <div className="max-w-5xl mx-auto">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
-            <h2 className="text-3xl font-bold text-foreground mb-10 text-center">Model Guru yang Dituju</h2>
+            <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-6 sm:mb-10 text-center">Model Guru yang Dituju</h2>
           </motion.div>
 
           {m.visi && (

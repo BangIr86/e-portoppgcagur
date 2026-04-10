@@ -28,7 +28,7 @@ const DashboardHome = () => {
   return (
     <div className="max-w-4xl mx-auto space-y-6 fade-in">
       <div>
-        <h1 className="text-2xl font-bold text-foreground">Selamat datang, {name}!</h1>
+        <h1 className="text-xl sm:text-2xl font-bold text-foreground break-words">Selamat datang, {name}!</h1>
         <p className="text-muted-foreground">Kelola e-portfolio PPG Prajabatan Anda.</p>
       </div>
 
