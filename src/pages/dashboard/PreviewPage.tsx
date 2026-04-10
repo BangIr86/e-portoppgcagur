@@ -23,8 +23,10 @@ const PreviewPage = () => {
           </Button>
         </Link>
       </div>
-      <div className="border rounded-lg overflow-hidden bg-card">
-        <PortfolioShowcase data={data} />
+      <div className="border rounded-lg overflow-hidden bg-card -mx-2 sm:mx-0">
+        <div className="overflow-x-hidden">
+          <PortfolioShowcase data={data} />
+        </div>
       </div>
     </div>
   );

@@ -17,7 +17,7 @@ const DashboardInner = () => {
             <h1 className="text-sm font-medium text-foreground">E-Portfolio PPG Prajabatan</h1>
             <SavingIndicator />
           </header>
-          <main className="flex-1 p-6 overflow-auto">
+          <main className="flex-1 p-3 sm:p-6 overflow-auto overflow-x-hidden">
             <Outlet />
           </main>
         </div>
