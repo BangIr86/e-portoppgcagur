@@ -11,20 +11,22 @@ const PreviewPage = () => {
 
   return (
     <div className="space-y-4 fade-in">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Preview Portfolio</h1>
-          <p className="text-muted-foreground">Tampilan portfolio publik Anda.</p>
+          <h1 className="text-xl sm:text-2xl font-bold text-foreground">Preview Portfolio</h1>
+          <p className="text-sm text-muted-foreground">Tampilan portfolio publik Anda.</p>
         </div>
         <Link to={`/portfolio/${user?.id}`} target="_blank">
-          <Button variant="outline">
+          <Button variant="outline" size="sm">
             <ExternalLink className="w-4 h-4 mr-2" />
             Buka di Tab Baru
           </Button>
         </Link>
       </div>
-      <div className="border rounded-lg overflow-hidden bg-card">
-        <PortfolioShowcase data={data} />
+      <div className="border rounded-lg overflow-hidden bg-card -mx-2 sm:mx-0">
+        <div className="overflow-x-hidden">
+          <PortfolioShowcase data={data} />
+        </div>
       </div>
     </div>
   );

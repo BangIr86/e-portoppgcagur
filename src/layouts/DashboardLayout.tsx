@@ -9,15 +9,15 @@ import { usePortfolio } from '@/contexts/PortfolioContext';
 const DashboardInner = () => {
   return (
     <SidebarProvider>
-      <div className="min-h-screen flex w-full">
+      <div className="min-h-screen flex w-full overflow-x-hidden">
         <DashboardSidebar />
-        <div className="flex-1 flex flex-col">
+        <div className="flex-1 flex flex-col min-w-0">
           <header className="h-14 flex items-center border-b bg-card px-4 gap-3">
             <SidebarTrigger />
             <h1 className="text-sm font-medium text-foreground">E-Portfolio PPG Prajabatan</h1>
             <SavingIndicator />
           </header>
-          <main className="flex-1 p-6 overflow-auto">
+          <main className="flex-1 p-3 sm:p-6 overflow-auto overflow-x-hidden">
             <Outlet />
           </main>
         </div>

@@ -28,7 +28,7 @@ const DashboardHome = () => {
   return (
     <div className="max-w-4xl mx-auto space-y-6 fade-in">
       <div>
-        <h1 className="text-2xl font-bold text-foreground">Selamat datang, {name}!</h1>
+        <h1 className="text-xl sm:text-2xl font-bold text-foreground break-words">Selamat datang, {name}!</h1>
         <p className="text-muted-foreground">Kelola e-portfolio PPG Prajabatan Anda.</p>
       </div>
 
@@ -76,15 +76,15 @@ const DashboardHome = () => {
         ))}
       </div>
 
-      <div className="flex gap-3">
+      <div className="flex flex-col sm:flex-row gap-3">
         <Link to="/dashboard/preview">
-          <Button>
+          <Button className="w-full sm:w-auto">
             <Eye className="w-4 h-4 mr-2" />
             Preview Portfolio
           </Button>
         </Link>
         <Link to={`/portfolio/${user?.id}`} target="_blank">
-          <Button variant="outline">
+          <Button variant="outline" className="w-full sm:w-auto">
             <ExternalLink className="w-4 h-4 mr-2" />
             Lihat Halaman Publik
           </Button>
