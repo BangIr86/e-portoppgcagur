@@ -108,6 +108,7 @@ const PortfolioShowcase = ({ data }: Props) => {
               </motion.div>
             ))}
           </motion.div>
+        </div>
       </section>
 
       {/* LAMPIRAN */}
