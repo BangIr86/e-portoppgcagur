@@ -4,7 +4,8 @@ import { AlertTriangle, BookOpen, CheckCircle, RefreshCw, FileText, Image as Ima
 import { Badge } from '@/components/ui/badge';
 import { useState } from 'react';
 
-const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0 } };
+const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: 'easeOut' } } };
+const staggerContainer = { hidden: {}, visible: { transition: { staggerChildren: 0.12 } } };
 
 interface Props {
   data: PortfolioData;
@@ -83,14 +84,14 @@ const PortfolioShowcase = ({ data }: Props) => {
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
             <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-6 sm:mb-10 text-center">Analisis Artefak Pembelajaran</h2>
           </motion.div>
-          <div className="grid md:grid-cols-2 gap-6">
+          <motion.div className="grid md:grid-cols-2 gap-6" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={staggerContainer}>
             {[
               { key: 'kendala', label: 'Kendala', icon: AlertTriangle, text: a.kendala },
               { key: 'teori_pedagogi', label: 'Teori Pedagogi', icon: BookOpen, text: a.teori_pedagogi },
               { key: 'faktor_keberhasilan', label: 'Faktor Keberhasilan', icon: CheckCircle, text: a.faktor_keberhasilan },
               { key: 'adaptasi_pembelajaran', label: 'Adaptasi Pembelajaran', icon: RefreshCw, text: a.adaptasi_pembelajaran },
-            ].map((item, i) => (
-              <motion.div key={item.key} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} transition={{ delay: i * 0.1 }}>
+            ].map((item) => (
+              <motion.div key={item.key} variants={fadeUp}>
                 <div
                   className="p-6 rounded-xl bg-card card-shadow hover:card-shadow-hover transition-all cursor-pointer"
                   onClick={() => setExpandedCard(expandedCard === item.key ? null : item.key)}
@@ -107,7 +108,7 @@ const PortfolioShowcase = ({ data }: Props) => {
               </motion.div>
             ))}
           </div>
-        </div>
+          </motion.div>
       </section>
 
       {/* LAMPIRAN */}
