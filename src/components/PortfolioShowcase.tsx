@@ -129,11 +129,38 @@ const PortfolioShowcase = ({ data }: Props) => {
                     </h3>
                     <div className="space-y-3">
                       {items.map(item => (
-                        <a key={item.id} href={item.file_url} target="_blank" rel="noopener noreferrer"
-                          className="flex items-center gap-3 p-4 rounded-lg bg-card card-shadow hover:card-shadow-hover transition-all">
-                          {item.file_type === 'image' ? <ImageIcon className="w-5 h-5 text-primary" /> : <FileText className="w-5 h-5 text-primary" />}
-                          <span className="text-sm text-foreground truncate">{item.nama}</span>
-                        </a>
+                        <div key={item.id} className="rounded-lg bg-card card-shadow overflow-hidden">
+                          {/* YouTube embed */}
+                          {item.file_type === 'youtube' && item.youtube_url && (
+                            <div className="aspect-video">
+                              <iframe
+                                src={`https://www.youtube.com/embed/${item.youtube_url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([a-zA-Z0-9_-]{11})/)?.[1] || ''}`}
+                                className="w-full h-full"
+                                allowFullScreen
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                              />
+                            </div>
+                          )}
+                          {/* Image preview */}
+                          {item.file_type === 'image' && (
+                            <a href={item.file_url} target="_blank" rel="noopener noreferrer">
+                              <img src={item.file_url} alt={item.judul || item.nama} className="w-full h-48 object-cover" />
+                            </a>
+                          )}
+                          {/* Info bar */}
+                          <a href={item.file_type === 'youtube' ? (item.youtube_url || '#') : item.file_url} target="_blank" rel="noopener noreferrer"
+                            className="flex items-center gap-3 p-4 hover:bg-muted/50 transition-colors">
+                            {item.file_type === 'image' ? <ImageIcon className="w-5 h-5 text-primary shrink-0" /> :
+                             item.file_type === 'youtube' ? <span className="text-lg shrink-0">▶️</span> :
+                             <FileText className="w-5 h-5 text-primary shrink-0" />}
+                            <div className="min-w-0">
+                              <p className="text-sm font-medium text-foreground truncate">{item.judul || item.nama}</p>
+                              {item.judul && item.judul !== item.nama && (
+                                <p className="text-xs text-muted-foreground truncate">{item.nama}</p>
+                              )}
+                            </div>
+                          </a>
+                        </div>
                       ))}
                     </div>
                   </motion.div>
