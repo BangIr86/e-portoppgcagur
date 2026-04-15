@@ -33,7 +33,7 @@ export interface LampiranItem {
   id: string;
   nama: string;
   judul: string;
-  tipe: 'lampiran_7' | 'lampiran_8';
+  tipe: string;
   file_url: string;
   file_type: string; // 'pdf' | 'image' | 'video' | 'youtube' | 'doc' | 'ppt' | 'other'
   youtube_url?: string;
