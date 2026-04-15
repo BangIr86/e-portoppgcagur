@@ -104,8 +104,23 @@ const FilePreview = ({ item, onRemove }: { item: LampiranItem; onRemove: () => v
             {item.file_type === 'image' && (
               <img src={item.file_url} alt={item.judul || item.nama} className="w-full rounded-lg" />
             )}
-            {item.file_type === 'pdf' && (
-              <iframe src={item.file_url} className="w-full h-[65vh] rounded-lg" />
+            {item.file_type === 'pdf' && item.file_url && (
+              <div className="flex flex-col gap-2">
+                <iframe
+                  src={`${item.file_url}#toolbar=1&navpanes=1&scrollbar=1`}
+                  title={item.judul || item.nama}
+                  className="w-full h-[65vh] rounded-lg border"
+                  style={{ minHeight: '500px' }}
+                />
+                <a
+                  href={item.file_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs text-primary hover:underline text-center"
+                >
+                  Buka di tab baru jika preview tidak muncul
+                </a>
+              </div>
             )}
             {item.file_type === 'video' && (
               <video src={item.file_url} controls className="w-full rounded-lg" />
