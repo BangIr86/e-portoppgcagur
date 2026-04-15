@@ -43,7 +43,7 @@ const FileIcon = ({ type }: { type: string }) => {
   }
 };
 
-const FilePreview = ({ item }: { item: LampiranItem }) => {
+const FilePreview = ({ item, onRemove }: { item: LampiranItem; onRemove: () => void }) => {
   const [previewOpen, setPreviewOpen] = useState(false);
 
   const canPreview = ['pdf', 'image', 'video', 'youtube'].includes(item.file_type);
@@ -54,7 +54,7 @@ const FilePreview = ({ item }: { item: LampiranItem }) => {
 
   return (
     <>
-      <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50 group">
+      <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
         {thumbnail ? (
           <img src={thumbnail} alt={item.judul || item.nama} className="w-16 h-12 object-cover rounded shrink-0" />
         ) : (
@@ -79,6 +79,9 @@ const FilePreview = ({ item }: { item: LampiranItem }) => {
               </a>
             </Button>
           )}
+          <Button variant="ghost" size="sm" onClick={onRemove}>
+            <Trash2 className="w-4 h-4 text-destructive" />
+          </Button>
         </div>
       </div>
 
@@ -117,20 +120,17 @@ const FilePreview = ({ item }: { item: LampiranItem }) => {
 const LampiranForm = () => {
   const { data, addLampiran, removeLampiran } = usePortfolio();
   const { user } = useAuth();
-  const fileRef7 = useRef<HTMLInputElement>(null);
-  const fileRef8 = useRef<HTMLInputElement>(null);
+  const fileRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
-  const [judul7, setJudul7] = useState('');
-  const [judul8, setJudul8] = useState('');
-  const [youtubeUrl7, setYoutubeUrl7] = useState('');
-  const [youtubeUrl8, setYoutubeUrl8] = useState('');
+  const [judul, setJudul] = useState('');
+  const [youtubeUrl, setYoutubeUrl] = useState('');
 
-  const handleUpload = async (file: File, tipe: 'lampiran_7' | 'lampiran_8', judul: string) => {
+  const handleUpload = async (file: File) => {
     if (!user) return;
     setUploading(true);
     const ext = file.name.split('.').pop();
     const id = crypto.randomUUID();
-    const path = `${user.id}/${tipe}/${id}.${ext}`;
+    const path = `${user.id}/lampiran/${id}.${ext}`;
     const { error } = await supabase.storage.from('portfolio-files').upload(path, file);
     if (error) { toast.error('Gagal upload file'); setUploading(false); return; }
     const { data: urlData } = supabase.storage.from('portfolio-files').getPublicUrl(path);
@@ -138,19 +138,18 @@ const LampiranForm = () => {
       id,
       nama: file.name,
       judul: judul || file.name,
-      tipe,
+      tipe: 'lampiran',
       file_url: urlData.publicUrl,
       file_type: getFileType(file),
     };
     addLampiran(item);
     toast.success('File berhasil diupload');
     setUploading(false);
-    if (tipe === 'lampiran_7') setJudul7('');
-    else setJudul8('');
+    setJudul('');
   };
 
-  const handleYoutubeAdd = (tipe: 'lampiran_7' | 'lampiran_8', judul: string, url: string) => {
-    if (!getYoutubeEmbedUrl(url)) {
+  const handleYoutubeAdd = () => {
+    if (!getYoutubeEmbedUrl(youtubeUrl)) {
       toast.error('URL YouTube tidak valid');
       return;
     }
@@ -158,125 +157,89 @@ const LampiranForm = () => {
       id: crypto.randomUUID(),
       nama: judul || 'Video YouTube',
       judul: judul || 'Video YouTube',
-      tipe,
-      file_url: url,
+      tipe: 'lampiran',
+      file_url: youtubeUrl,
       file_type: 'youtube',
-      youtube_url: url,
+      youtube_url: youtubeUrl,
     };
     addLampiran(item);
     toast.success('Link YouTube berhasil ditambahkan');
-    if (tipe === 'lampiran_7') { setJudul7(''); setYoutubeUrl7(''); }
-    else { setJudul8(''); setYoutubeUrl8(''); }
+    setJudul('');
+    setYoutubeUrl('');
   };
-
-  const lamp7 = data.lampiran.filter(l => l.tipe === 'lampiran_7');
-  const lamp8 = data.lampiran.filter(l => l.tipe === 'lampiran_8');
-
-  const LampiranSection = ({
-    tipe, items, judul, setJudul, youtubeUrl, setYoutubeUrl, fileRef, title, description,
-  }: {
-    tipe: 'lampiran_7' | 'lampiran_8';
-    items: LampiranItem[];
-    judul: string; setJudul: (v: string) => void;
-    youtubeUrl: string; setYoutubeUrl: (v: string) => void;
-    fileRef: React.RefObject<HTMLInputElement>;
-    title: string; description: string;
-  }) => (
-    <Card className="card-shadow">
-      <CardHeader>
-        <CardTitle className="text-base">{title}</CardTitle>
-        <CardDescription>{description}</CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        {/* Existing items */}
-        <div className="space-y-2">
-          {items.map(item => (
-            <div key={item.id} className="relative">
-              <FilePreview item={item} />
-              <Button
-                variant="ghost" size="sm"
-                className="absolute top-2 right-2 opacity-0 group-hover:opacity-100"
-                onClick={() => removeLampiran(item.id)}
-              >
-                <Trash2 className="w-4 h-4 text-destructive" />
-              </Button>
-            </div>
-          ))}
-          {items.length === 0 && <p className="text-sm text-muted-foreground">Belum ada file</p>}
-        </div>
-
-        {/* Add new */}
-        <div className="border-t pt-4 space-y-3">
-          <div>
-            <Label className="text-sm">Judul Lampiran</Label>
-            <Input
-              placeholder="Masukkan judul lampiran..."
-              value={judul}
-              onChange={e => setJudul(e.target.value)}
-            />
-          </div>
-
-          <div className="flex flex-col sm:flex-row gap-2">
-            <input
-              ref={fileRef}
-              type="file"
-              accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.ppt,.pptx,.mp4,.webm"
-              className="hidden"
-              onChange={e => {
-                if (e.target.files?.[0]) handleUpload(e.target.files[0], tipe, judul);
-                e.target.value = '';
-              }}
-            />
-            <Button variant="outline" onClick={() => fileRef.current?.click()} disabled={uploading} className="flex-1">
-              <Upload className="w-4 h-4 mr-2" />{uploading ? 'Mengupload...' : 'Upload File'}
-            </Button>
-          </div>
-
-          <div className="flex flex-col sm:flex-row gap-2">
-            <Input
-              placeholder="Paste link YouTube..."
-              value={youtubeUrl}
-              onChange={e => setYoutubeUrl(e.target.value)}
-              className="flex-1"
-            />
-            <Button
-              variant="outline"
-              onClick={() => handleYoutubeAdd(tipe, judul, youtubeUrl)}
-              disabled={!youtubeUrl}
-            >
-              <Youtube className="w-4 h-4 mr-2" />Tambah Video
-            </Button>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-  );
 
   return (
     <PageTransition>
       <div className="max-w-3xl mx-auto space-y-6">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Lampiran Penilaian</h1>
-          <p className="text-muted-foreground">Upload dokumen, foto, video, atau link YouTube.</p>
+          <h1 className="text-2xl font-bold text-foreground">Lampiran Karya</h1>
+          <p className="text-muted-foreground">Upload dokumen, foto, video, atau link YouTube sebanyak yang dibutuhkan.</p>
         </div>
 
-        <LampiranSection
-          tipe="lampiran_7" items={lamp7}
-          judul={judul7} setJudul={setJudul7}
-          youtubeUrl={youtubeUrl7} setYoutubeUrl={setYoutubeUrl7}
-          fileRef={fileRef7 as React.RefObject<HTMLInputElement>}
-          title="Lampiran 7 — Perangkat Pembelajaran"
-          description="RPP, silabus, dan dokumen perangkat lainnya"
-        />
+        {/* Add new lampiran */}
+        <Card className="card-shadow">
+          <CardHeader>
+            <CardTitle className="text-base">Tambah Lampiran Baru</CardTitle>
+            <CardDescription>Upload file atau tambahkan link YouTube dengan judul kustom</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div>
+              <Label className="text-sm">Judul Lampiran</Label>
+              <Input
+                placeholder="Masukkan judul lampiran..."
+                value={judul}
+                onChange={e => setJudul(e.target.value)}
+              />
+            </div>
 
-        <LampiranSection
-          tipe="lampiran_8" items={lamp8}
-          judul={judul8} setJudul={setJudul8}
-          youtubeUrl={youtubeUrl8} setYoutubeUrl={setYoutubeUrl8}
-          fileRef={fileRef8 as React.RefObject<HTMLInputElement>}
-          title="Lampiran 8 — Praktik Mengajar"
-          description="Dokumentasi video, foto, dan evaluasi praktik"
-        />
+            <div className="flex flex-col sm:flex-row gap-2">
+              <input
+                ref={fileRef}
+                type="file"
+                accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.ppt,.pptx,.mp4,.webm"
+                className="hidden"
+                onChange={e => {
+                  if (e.target.files?.[0]) handleUpload(e.target.files[0]);
+                  e.target.value = '';
+                }}
+              />
+              <Button variant="outline" onClick={() => fileRef.current?.click()} disabled={uploading} className="flex-1">
+                <Upload className="w-4 h-4 mr-2" />{uploading ? 'Mengupload...' : 'Upload File'}
+              </Button>
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-2">
+              <Input
+                placeholder="Paste link YouTube..."
+                value={youtubeUrl}
+                onChange={e => setYoutubeUrl(e.target.value)}
+                className="flex-1"
+              />
+              <Button
+                variant="outline"
+                onClick={handleYoutubeAdd}
+                disabled={!youtubeUrl}
+              >
+                <Youtube className="w-4 h-4 mr-2" />Tambah Video
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* List lampiran */}
+        <Card className="card-shadow">
+          <CardHeader>
+            <CardTitle className="text-base">Daftar Lampiran ({data.lampiran.length})</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            {data.lampiran.length === 0 && (
+              <p className="text-sm text-muted-foreground text-center py-4">Belum ada lampiran. Tambahkan lampiran di atas.</p>
+            )}
+            {data.lampiran.map(item => (
+              <FilePreview key={item.id} item={item} onRemove={() => removeLampiran(item.id)} />
+            ))}
+          </CardContent>
+        </Card>
       </div>
     </PageTransition>
   );
