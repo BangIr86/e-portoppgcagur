@@ -135,13 +135,46 @@ const FilePreview = ({ item, onRemove }: { item: LampiranItem; onRemove: () => v
   );
 };
 
+const SortableItem = ({ item, onRemove }: { item: LampiranItem; onRemove: () => void }) => {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: item.id });
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+  return (
+    <div ref={setNodeRef} style={style} className="flex items-start gap-2">
+      <button {...attributes} {...listeners} className="mt-3 cursor-grab active:cursor-grabbing text-muted-foreground hover:text-foreground touch-none">
+        <GripVertical className="w-5 h-5" />
+      </button>
+      <div className="flex-1">
+        <FilePreview item={item} onRemove={onRemove} />
+      </div>
+    </div>
+  );
+};
+
 const LampiranForm = () => {
-  const { data, addLampiran, removeLampiran } = usePortfolio();
+  const { data, addLampiran, removeLampiran, reorderLampiran } = usePortfolio();
   const { user } = useAuth();
   const fileRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
   const [judul, setJudul] = useState('');
   const [youtubeUrl, setYoutubeUrl] = useState('');
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+  );
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (over && active.id !== over.id) {
+      const oldIndex = data.lampiran.findIndex(l => l.id === active.id);
+      const newIndex = data.lampiran.findIndex(l => l.id === over.id);
+      reorderLampiran(arrayMove(data.lampiran, oldIndex, newIndex));
+    }
+  };
 
   const handleUpload = async (file: File) => {
     if (!user) return;
