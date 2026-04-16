@@ -281,14 +281,21 @@ const LampiranForm = () => {
         <Card className="card-shadow">
           <CardHeader>
             <CardTitle className="text-base">Daftar Lampiran ({data.lampiran.length})</CardTitle>
+            {data.lampiran.length > 1 && (
+              <CardDescription>Seret ikon ⠿ untuk mengubah urutan</CardDescription>
+            )}
           </CardHeader>
           <CardContent className="space-y-2">
             {data.lampiran.length === 0 && (
               <p className="text-sm text-muted-foreground text-center py-4">Belum ada lampiran. Tambahkan lampiran di atas.</p>
             )}
-            {data.lampiran.map(item => (
-              <FilePreview key={item.id} item={item} onRemove={() => removeLampiran(item.id)} />
-            ))}
+            <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+              <SortableContext items={data.lampiran.map(l => l.id)} strategy={verticalListSortingStrategy}>
+                {data.lampiran.map(item => (
+                  <SortableItem key={item.id} item={item} onRemove={() => removeLampiran(item.id)} />
+                ))}
+              </SortableContext>
+            </DndContext>
           </CardContent>
         </Card>
       </div>
