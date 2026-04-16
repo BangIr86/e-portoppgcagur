@@ -116,7 +116,7 @@ const PortfolioShowcase = ({ data }: Props) => {
         <section className="py-10 sm:py-16 px-4 sm:px-6">
           <div className="max-w-5xl mx-auto">
             <motion.div initial="hidden" animate="visible" variants={fadeUp}>
-              <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-6 sm:mb-10 text-center">Lampiran Penilaian</h2>
+              <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-6 sm:mb-10 text-center">Lampiran</h2>
             </motion.div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               {data.lampiran.map((item, index) => (
