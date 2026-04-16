@@ -118,7 +118,7 @@ const PortfolioShowcase = ({ data }: Props) => {
             <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
               <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-6 sm:mb-10 text-center">Lampiran Penilaian</h2>
             </motion.div>
-            <div className="grid md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               {data.lampiran.map(item => (
                 <motion.div key={item.id} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
                   <div className="rounded-lg bg-card card-shadow overflow-hidden">
