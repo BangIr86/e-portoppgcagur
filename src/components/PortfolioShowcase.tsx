@@ -118,54 +118,49 @@ const PortfolioShowcase = ({ data }: Props) => {
             <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
               <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-6 sm:mb-10 text-center">Lampiran Penilaian</h2>
             </motion.div>
-            <div className="grid md:grid-cols-2 gap-8">
-              {['lampiran_7', 'lampiran_8'].map(tipe => {
-                const items = data.lampiran.filter(l => l.tipe === tipe);
-                if (items.length === 0) return null;
-                return (
-                  <motion.div key={tipe} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
-                    <h3 className="font-semibold text-foreground mb-4">
-                      {tipe === 'lampiran_7' ? 'Perangkat Pembelajaran' : 'Praktik Mengajar'}
-                    </h3>
-                    <div className="space-y-3">
-                      {items.map(item => (
-                        <div key={item.id} className="rounded-lg bg-card card-shadow overflow-hidden">
-                          {/* YouTube embed */}
-                          {item.file_type === 'youtube' && item.youtube_url && (
-                            <div className="aspect-video">
-                              <iframe
-                                src={`https://www.youtube.com/embed/${item.youtube_url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([a-zA-Z0-9_-]{11})/)?.[1] || ''}`}
-                                className="w-full h-full"
-                                allowFullScreen
-                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                              />
-                            </div>
-                          )}
-                          {/* Image preview */}
-                          {item.file_type === 'image' && (
-                            <a href={item.file_url} target="_blank" rel="noopener noreferrer">
-                              <img src={item.file_url} alt={item.judul || item.nama} className="w-full h-48 object-cover" />
-                            </a>
-                          )}
-                          {/* Info bar */}
-                          <a href={item.file_type === 'youtube' ? (item.youtube_url || '#') : item.file_url} target="_blank" rel="noopener noreferrer"
-                            className="flex items-center gap-3 p-4 hover:bg-muted/50 transition-colors">
-                            {item.file_type === 'image' ? <ImageIcon className="w-5 h-5 text-primary shrink-0" /> :
-                             item.file_type === 'youtube' ? <span className="text-lg shrink-0">▶️</span> :
-                             <FileText className="w-5 h-5 text-primary shrink-0" />}
-                            <div className="min-w-0">
-                              <p className="text-sm font-medium text-foreground truncate">{item.judul || item.nama}</p>
-                              {item.judul && item.judul !== item.nama && (
-                                <p className="text-xs text-muted-foreground truncate">{item.nama}</p>
-                              )}
-                            </div>
-                          </a>
-                        </div>
-                      ))}
-                    </div>
-                  </motion.div>
-                );
-              })}
+            <div className="grid md:grid-cols-2 gap-6">
+              {data.lampiran.map(item => (
+                <motion.div key={item.id} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
+                  <div className="rounded-lg bg-card card-shadow overflow-hidden">
+                    {/* YouTube embed */}
+                    {item.file_type === 'youtube' && item.youtube_url && (
+                      <div className="aspect-video">
+                        <iframe
+                          src={`https://www.youtube.com/embed/${item.youtube_url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([a-zA-Z0-9_-]{11})/)?.[1] || ''}`}
+                          className="w-full h-full"
+                          allowFullScreen
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        />
+                      </div>
+                    )}
+                    {/* Image preview */}
+                    {item.file_type === 'image' && (
+                      <a href={item.file_url} target="_blank" rel="noopener noreferrer">
+                        <img src={item.file_url} alt={item.judul || item.nama} className="w-full h-48 object-cover" />
+                      </a>
+                    )}
+                    {/* PDF embed preview */}
+                    {item.file_type === 'pdf' && item.file_url && (
+                      <div className="h-48 bg-muted/30">
+                        <iframe src={`${item.file_url}#toolbar=0&navpanes=0`} className="w-full h-full" title={item.judul || item.nama} />
+                      </div>
+                    )}
+                    {/* Info bar */}
+                    <a href={item.file_type === 'youtube' ? (item.youtube_url || '#') : item.file_url} target="_blank" rel="noopener noreferrer"
+                      className="flex items-center gap-3 p-4 hover:bg-muted/50 transition-colors">
+                      {item.file_type === 'image' ? <ImageIcon className="w-5 h-5 text-primary shrink-0" /> :
+                       item.file_type === 'youtube' ? <span className="text-lg shrink-0">▶️</span> :
+                       <FileText className="w-5 h-5 text-primary shrink-0" />}
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium text-foreground truncate">{item.judul || item.nama}</p>
+                        {item.judul && item.judul !== item.nama && (
+                          <p className="text-xs text-muted-foreground truncate">{item.nama}</p>
+                        )}
+                      </div>
+                    </a>
+                  </div>
+                </motion.div>
+              ))}
             </div>
           </div>
         </section>
