@@ -8,8 +8,11 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { useRef, useState } from 'react';
-import { Upload, FileText, Trash2, Image as ImageIcon, Youtube, Eye, File, Presentation } from 'lucide-react';
+import { Upload, FileText, Trash2, Image as ImageIcon, Youtube, Eye, File, Presentation, GripVertical } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
+import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 
 const getFileType = (file: File): string => {
   const name = file.name.toLowerCase();
@@ -132,13 +135,46 @@ const FilePreview = ({ item, onRemove }: { item: LampiranItem; onRemove: () => v
   );
 };
 
+const SortableItem = ({ item, onRemove }: { item: LampiranItem; onRemove: () => void }) => {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: item.id });
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+  return (
+    <div ref={setNodeRef} style={style} className="flex items-start gap-2">
+      <button {...attributes} {...listeners} className="mt-3 cursor-grab active:cursor-grabbing text-muted-foreground hover:text-foreground touch-none">
+        <GripVertical className="w-5 h-5" />
+      </button>
+      <div className="flex-1">
+        <FilePreview item={item} onRemove={onRemove} />
+      </div>
+    </div>
+  );
+};
+
 const LampiranForm = () => {
-  const { data, addLampiran, removeLampiran } = usePortfolio();
+  const { data, addLampiran, removeLampiran, reorderLampiran } = usePortfolio();
   const { user } = useAuth();
   const fileRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
   const [judul, setJudul] = useState('');
   const [youtubeUrl, setYoutubeUrl] = useState('');
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+  );
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (over && active.id !== over.id) {
+      const oldIndex = data.lampiran.findIndex(l => l.id === active.id);
+      const newIndex = data.lampiran.findIndex(l => l.id === over.id);
+      reorderLampiran(arrayMove(data.lampiran, oldIndex, newIndex));
+    }
+  };
 
   const handleUpload = async (file: File) => {
     if (!user) return;
@@ -245,14 +281,21 @@ const LampiranForm = () => {
         <Card className="card-shadow">
           <CardHeader>
             <CardTitle className="text-base">Daftar Lampiran ({data.lampiran.length})</CardTitle>
+            {data.lampiran.length > 1 && (
+              <CardDescription>Seret ikon ⠿ untuk mengubah urutan</CardDescription>
+            )}
           </CardHeader>
           <CardContent className="space-y-2">
             {data.lampiran.length === 0 && (
               <p className="text-sm text-muted-foreground text-center py-4">Belum ada lampiran. Tambahkan lampiran di atas.</p>
             )}
-            {data.lampiran.map(item => (
-              <FilePreview key={item.id} item={item} onRemove={() => removeLampiran(item.id)} />
-            ))}
+            <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+              <SortableContext items={data.lampiran.map(l => l.id)} strategy={verticalListSortingStrategy}>
+                {data.lampiran.map(item => (
+                  <SortableItem key={item.id} item={item} onRemove={() => removeLampiran(item.id)} />
+                ))}
+              </SortableContext>
+            </DndContext>
           </CardContent>
         </Card>
       </div>

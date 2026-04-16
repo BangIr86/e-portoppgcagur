@@ -63,6 +63,7 @@ interface PortfolioContextType {
   updateModelGuru: (model: Partial<ModelGuruData>) => void;
   addLampiran: (item: LampiranItem) => void;
   removeLampiran: (id: string) => void;
+  reorderLampiran: (items: LampiranItem[]) => void;
   saving: boolean;
   completionPercent: number;
   loadPortfolio: (userId?: string) => Promise<PortfolioData | null>;
@@ -145,6 +146,11 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     autoSave(newData);
   };
 
+  const reorderLampiran = (items: LampiranItem[]) => {
+    const newData = { ...data, lampiran: items };
+    autoSave(newData);
+  };
+
   const completionPercent = (() => {
     let filled = 0;
     let total = 0;
@@ -165,7 +171,7 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   })();
 
   return (
-    <PortfolioContext.Provider value={{ data, updateProfile, updateArtefak, updateModelGuru, addLampiran, removeLampiran, saving, completionPercent, loadPortfolio }}>
+    <PortfolioContext.Provider value={{ data, updateProfile, updateArtefak, updateModelGuru, addLampiran, removeLampiran, reorderLampiran, saving, completionPercent, loadPortfolio }}>
       {children}
     </PortfolioContext.Provider>
   );
