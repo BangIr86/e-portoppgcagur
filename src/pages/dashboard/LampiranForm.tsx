@@ -8,8 +8,11 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { useRef, useState } from 'react';
-import { Upload, FileText, Trash2, Image as ImageIcon, Youtube, Eye, File, Presentation } from 'lucide-react';
+import { Upload, FileText, Trash2, Image as ImageIcon, Youtube, Eye, File, Presentation, GripVertical } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
+import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 
 const getFileType = (file: File): string => {
   const name = file.name.toLowerCase();
