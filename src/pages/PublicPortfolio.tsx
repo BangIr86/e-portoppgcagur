@@ -21,20 +21,36 @@ const PublicPortfolio = () => {
 
   useEffect(() => {
     const load = async () => {
-      if (!identifier) return;
+      if (!identifier) {
+        setLoading(false);
+        return;
+      }
       const isUuid = UUID_RE.test(identifier);
-      const query = supabase.from('portfolios').select('*');
-      const { data: row } = isUuid
-        ? await query.eq('user_id', identifier).maybeSingle()
-        : await query.eq('slug', identifier).maybeSingle();
 
-      if (row) {
-        // If accessed by UUID but a slug exists, redirect to slug URL
-        const rowSlug = (row as any).slug as string | null;
-        if (isUuid && rowSlug) {
+      if (isUuid) {
+        // UUID access is private — only allow if it resolves to a slug, then redirect.
+        const { data: row } = await supabase
+          .from('portfolios')
+          .select('slug')
+          .eq('user_id', identifier)
+          .maybeSingle();
+        const rowSlug = (row as any)?.slug as string | null | undefined;
+        if (rowSlug) {
           setRedirectSlug(rowSlug);
           return;
         }
+        // No slug → treat as not found (UUID URLs are disabled)
+        setLoading(false);
+        return;
+      }
+
+      const { data: row } = await supabase
+        .from('portfolios')
+        .select('*')
+        .eq('slug', identifier)
+        .maybeSingle();
+
+      if (row) {
         setData({
           profile: (row.profile_data as any) || defaultPortfolio.profile,
           artefak: (row.artefak_data as any) || defaultPortfolio.artefak,
