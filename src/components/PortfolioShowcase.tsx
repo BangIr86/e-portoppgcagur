@@ -118,36 +118,32 @@ const PortfolioShowcase = ({ data }: Props) => {
             <motion.div initial="hidden" animate="visible" variants={fadeUp}>
               <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-6 sm:mb-10 text-center">Lampiran</h2>
             </motion.div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 auto-rows-fr">
               {data.lampiran.map((item, index) => (
-                <motion.div key={item.id} initial="hidden" animate="visible" variants={fadeUp} transition={{ delay: index * 0.1 }}>
-                  <div className="rounded-lg bg-card card-shadow overflow-hidden">
-                    {/* YouTube embed */}
-                    {item.file_type === 'youtube' && item.youtube_url && (
-                      <div className="aspect-video">
+                <motion.div key={item.id} initial="hidden" animate="visible" variants={fadeUp} transition={{ delay: index * 0.1 }} className="h-full">
+                  <div className="rounded-lg bg-card card-shadow overflow-hidden h-full flex flex-col">
+                    {/* Media area — uniform aspect ratio so left/right match */}
+                    <div className="aspect-video w-full bg-muted/30 shrink-0">
+                      {item.file_type === 'youtube' && item.youtube_url && (
                         <iframe
                           src={`https://www.youtube.com/embed/${item.youtube_url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([a-zA-Z0-9_-]{11})/)?.[1] || ''}`}
                           className="w-full h-full"
                           allowFullScreen
                           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                         />
-                      </div>
-                    )}
-                    {/* Image preview */}
-                    {item.file_type === 'image' && (
-                      <a href={item.file_url} target="_blank" rel="noopener noreferrer">
-                        <img src={item.file_url} alt={item.judul || item.nama} className="w-full h-48 object-cover" />
-                      </a>
-                    )}
-                    {/* PDF embed preview */}
-                    {item.file_type === 'pdf' && item.file_url && (
-                      <div className="h-48 bg-muted/30">
+                      )}
+                      {item.file_type === 'image' && (
+                        <a href={item.file_url} target="_blank" rel="noopener noreferrer" className="block w-full h-full">
+                          <img src={item.file_url} alt={item.judul || item.nama} className="w-full h-full object-cover" />
+                        </a>
+                      )}
+                      {item.file_type === 'pdf' && item.file_url && (
                         <iframe src={`${item.file_url}#toolbar=0&navpanes=0`} className="w-full h-full" title={item.judul || item.nama} />
-                      </div>
-                    )}
+                      )}
+                    </div>
                     {/* Info bar */}
                     <a href={item.file_type === 'youtube' ? (item.youtube_url || '#') : item.file_url} target="_blank" rel="noopener noreferrer"
-                      className="flex items-center gap-3 p-4 hover:bg-muted/50 transition-colors">
+                      className="flex items-center gap-3 p-4 hover:bg-muted/50 transition-colors mt-auto">
                       {item.file_type === 'image' ? <ImageIcon className="w-5 h-5 text-primary shrink-0" /> :
                        item.file_type === 'youtube' ? <span className="text-lg shrink-0">▶️</span> :
                        <FileText className="w-5 h-5 text-primary shrink-0" />}
