@@ -73,7 +73,7 @@ const SlugEditor = () => {
 
   const StatusIcon = () => {
     if (status === 'checking') return <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />;
-    if (status === 'available') return <Check className="w-4 h-4 text-green-600" />;
+    if (status === 'available') return <Check className="w-4 h-4 text-primary" />;
     if (status === 'current') return <Check className="w-4 h-4 text-muted-foreground" />;
     if (status === 'taken' || status === 'invalid') return <X className="w-4 h-4 text-destructive" />;
     return <LinkIcon className="w-4 h-4 text-muted-foreground" />;
@@ -121,7 +121,7 @@ const SlugEditor = () => {
             <p className="text-xs text-destructive">{errorMsg}</p>
           )}
           {status === 'available' && (
-            <p className="text-xs text-green-600">Tersedia! Klik "Simpan Slug" untuk menggunakan.</p>
+            <p className="text-xs text-primary">Tersedia! Klik "Simpan Slug" untuk menggunakan.</p>
           )}
           {status === 'current' && slug && (
             <p className="text-xs text-muted-foreground">Ini adalah slug Anda saat ini.</p>
