@@ -230,7 +230,7 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   })();
 
   return (
-    <PortfolioContext.Provider value={{ data, slug, updateProfile, updateArtefak, updateModelGuru, addLampiran, removeLampiran, reorderLampiran, saving, completionPercent, loadPortfolio }}>
+    <PortfolioContext.Provider value={{ data, slug, updateProfile, updateArtefak, updateModelGuru, addLampiran, removeLampiran, reorderLampiran, updateSlug: updateSlugFn, checkSlugAvailable, saving, completionPercent, loadPortfolio }}>
       {children}
     </PortfolioContext.Provider>
   );
