@@ -66,6 +66,8 @@ interface PortfolioContextType {
   addLampiran: (item: LampiranItem) => void;
   removeLampiran: (id: string) => void;
   reorderLampiran: (items: LampiranItem[]) => void;
+  updateSlug: (newSlug: string) => Promise<{ ok: boolean; error?: string; slug?: string }>;
+  checkSlugAvailable: (candidate: string) => Promise<boolean>;
   saving: boolean;
   completionPercent: number;
   loadPortfolio: (userId?: string) => Promise<PortfolioData | null>;
