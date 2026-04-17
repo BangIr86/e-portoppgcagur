@@ -42,7 +42,7 @@ const App = () => (
               <Route path="model-guru" element={<ModelGuruForm />} />
               <Route path="preview" element={<PreviewPage />} />
             </Route>
-            <Route path="/portfolio/:userId" element={<PublicPortfolio />} />
+            <Route path="/portfolio/:identifier" element={<PublicPortfolio />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>

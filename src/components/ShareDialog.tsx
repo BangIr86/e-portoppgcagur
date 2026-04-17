@@ -8,11 +8,12 @@ import { toast } from 'sonner';
 
 interface ShareDialogProps {
   userId: string;
+  slug?: string | null;
 }
 
-const ShareDialog = ({ userId }: ShareDialogProps) => {
+const ShareDialog = ({ userId, slug }: ShareDialogProps) => {
   const [copied, setCopied] = useState(false);
-  const portfolioUrl = `${window.location.origin}/portfolio/${userId}`;
+  const portfolioUrl = `${window.location.origin}/portfolio/${slug || userId}`;
 
   const handleCopy = async () => {
     await navigator.clipboard.writeText(portfolioUrl);

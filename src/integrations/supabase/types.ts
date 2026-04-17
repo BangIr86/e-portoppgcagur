@@ -22,6 +22,7 @@ export type Database = {
           lampiran_data: Json | null
           model_guru_data: Json | null
           profile_data: Json | null
+          slug: string | null
           updated_at: string
           user_id: string
         }
@@ -32,6 +33,7 @@ export type Database = {
           lampiran_data?: Json | null
           model_guru_data?: Json | null
           profile_data?: Json | null
+          slug?: string | null
           updated_at?: string
           user_id: string
         }
@@ -42,6 +44,7 @@ export type Database = {
           lampiran_data?: Json | null
           model_guru_data?: Json | null
           profile_data?: Json | null
+          slug?: string | null
           updated_at?: string
           user_id?: string
         }
