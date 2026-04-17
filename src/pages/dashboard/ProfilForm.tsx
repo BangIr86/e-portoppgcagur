@@ -9,6 +9,7 @@ import { supabase } from '@/lib/supabase';
 import { toast } from 'sonner';
 import { useRef } from 'react';
 import { Camera } from 'lucide-react';
+import SlugEditor from '@/components/SlugEditor';
 
 const ProfilForm = () => {
   const { data, updateProfile } = usePortfolio();
@@ -56,6 +57,8 @@ const ProfilForm = () => {
           </div>
         </CardContent>
       </Card>
+
+      <SlugEditor />
 
       <Card className="card-shadow">
         <CardHeader>

@@ -66,6 +66,8 @@ interface PortfolioContextType {
   addLampiran: (item: LampiranItem) => void;
   removeLampiran: (id: string) => void;
   reorderLampiran: (items: LampiranItem[]) => void;
+  updateSlug: (newSlug: string) => Promise<{ ok: boolean; error?: string; slug?: string }>;
+  checkSlugAvailable: (candidate: string) => Promise<boolean>;
   saving: boolean;
   completionPercent: number;
   loadPortfolio: (userId?: string) => Promise<PortfolioData | null>;
@@ -84,10 +86,10 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     if (!user) return;
     setSaving(true);
     try {
-      // Generate slug from full_name if missing or if name changed significantly
+      // Auto-generate slug ONLY when none exists yet. Once user has a slug
+      // (auto or manual), it persists until they explicitly change it via updateSlug.
       let nextSlug = slugRef.current;
-      const desiredBase = slugify(newData.profile.full_name || '');
-      if (desiredBase && (!nextSlug || !nextSlug.startsWith(desiredBase))) {
+      if (!nextSlug && newData.profile.full_name) {
         nextSlug = await generateUniqueSlug(newData.profile.full_name, user.id);
         slugRef.current = nextSlug;
         setSlug(nextSlug);
@@ -108,6 +110,44 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       setSaving(false);
     }
   }, [user]);
+
+  const checkSlugAvailable = useCallback(async (candidate: string): Promise<boolean> => {
+    const cleaned = slugify(candidate);
+    if (!cleaned) return false;
+    if (cleaned === slugRef.current) return true; // current slug is "available" to self
+    const { data: row } = await supabase
+      .from('portfolios')
+      .select('user_id')
+      .eq('slug', cleaned)
+      .maybeSingle();
+    if (!row) return true;
+    return row.user_id === user?.id;
+  }, [user]);
+
+  const updateSlugFn = useCallback(async (newSlug: string) => {
+    if (!user) return { ok: false as const, error: 'Tidak terautentikasi' };
+    const cleaned = slugify(newSlug);
+    if (!cleaned) return { ok: false as const, error: 'Slug tidak valid' };
+    if (cleaned.length < 3) return { ok: false as const, error: 'Minimal 3 karakter' };
+    if (cleaned === slugRef.current) return { ok: true as const, slug: cleaned };
+
+    const available = await checkSlugAvailable(cleaned);
+    if (!available) return { ok: false as const, error: 'Slug sudah digunakan' };
+
+    setSaving(true);
+    try {
+      const { error } = await supabase
+        .from('portfolios')
+        .update({ slug: cleaned, updated_at: new Date().toISOString() })
+        .eq('user_id', user.id);
+      if (error) return { ok: false as const, error: 'Gagal menyimpan slug' };
+      slugRef.current = cleaned;
+      setSlug(cleaned);
+      return { ok: true as const, slug: cleaned };
+    } finally {
+      setSaving(false);
+    }
+  }, [user, checkSlugAvailable]);
 
   const loadPortfolio = useCallback(async (userId?: string) => {
     const id = userId || user?.id;
@@ -190,7 +230,7 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   })();
 
   return (
-    <PortfolioContext.Provider value={{ data, slug, updateProfile, updateArtefak, updateModelGuru, addLampiran, removeLampiran, reorderLampiran, saving, completionPercent, loadPortfolio }}>
+    <PortfolioContext.Provider value={{ data, slug, updateProfile, updateArtefak, updateModelGuru, addLampiran, removeLampiran, reorderLampiran, updateSlug: updateSlugFn, checkSlugAvailable, saving, completionPercent, loadPortfolio }}>
       {children}
     </PortfolioContext.Provider>
   );
