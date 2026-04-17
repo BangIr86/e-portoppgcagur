@@ -9,7 +9,8 @@ import ShareDialog from '@/components/ShareDialog';
 
 const PreviewPage = () => {
   const { user } = useAuth();
-  const { data } = usePortfolio();
+  const { data, slug } = usePortfolio();
+  const publicId = slug || user?.id;
 
   return (
     <PageTransition>
@@ -20,8 +21,8 @@ const PreviewPage = () => {
             <p className="text-sm text-muted-foreground">Tampilan portfolio publik Anda.</p>
           </div>
           <div className="flex gap-2">
-            {user && <ShareDialog userId={user.id} />}
-            <Link to={`/portfolio/${user?.id}`} target="_blank">
+            {user && <ShareDialog userId={user.id} slug={slug} />}
+            <Link to={`/portfolio/${publicId}`} target="_blank">
               <Button variant="outline" size="sm">
                 <ExternalLink className="w-4 h-4 mr-2" />
                 Buka di Tab Baru
