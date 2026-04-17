@@ -1,7 +1,8 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from './AuthContext';
 import { toast } from 'sonner';
+import { generateUniqueSlug, slugify } from '@/lib/slug';
 
 export interface ProfileData {
   full_name: string;
@@ -58,6 +59,7 @@ const defaultPortfolio: PortfolioData = {
 
 interface PortfolioContextType {
   data: PortfolioData;
+  slug: string | null;
   updateProfile: (profile: Partial<ProfileData>) => void;
   updateArtefak: (artefak: Partial<ArtefakData>) => void;
   updateModelGuru: (model: Partial<ModelGuruData>) => void;
@@ -74,18 +76,30 @@ const PortfolioContext = createContext<PortfolioContextType | undefined>(undefin
 export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user } = useAuth();
   const [data, setData] = useState<PortfolioData>(defaultPortfolio);
+  const [slug, setSlug] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const slugRef = useRef<string | null>(null);
 
   const saveToDb = useCallback(async (newData: PortfolioData) => {
     if (!user) return;
     setSaving(true);
     try {
+      // Generate slug from full_name if missing or if name changed significantly
+      let nextSlug = slugRef.current;
+      const desiredBase = slugify(newData.profile.full_name || '');
+      if (desiredBase && (!nextSlug || !nextSlug.startsWith(desiredBase))) {
+        nextSlug = await generateUniqueSlug(newData.profile.full_name, user.id);
+        slugRef.current = nextSlug;
+        setSlug(nextSlug);
+      }
+
       await supabase.from('portfolios').upsert({
         user_id: user.id,
         profile_data: newData.profile as any,
         artefak_data: newData.artefak as any,
         model_guru_data: newData.model_guru as any,
         lampiran_data: newData.lampiran as any,
+        ...(nextSlug ? { slug: nextSlug } : {}),
         updated_at: new Date().toISOString(),
       }, { onConflict: 'user_id' });
     } catch {
@@ -106,7 +120,12 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         model_guru: (row.model_guru_data as any) || defaultPortfolio.model_guru,
         lampiran: (row.lampiran_data as any) || defaultPortfolio.lampiran,
       };
-      if (!userId || userId === user?.id) setData(loaded);
+      if (!userId || userId === user?.id) {
+        setData(loaded);
+        const loadedSlug = (row as any).slug || null;
+        slugRef.current = loadedSlug;
+        setSlug(loadedSlug);
+      }
       return loaded;
     }
     return null;
@@ -171,7 +190,7 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   })();
 
   return (
-    <PortfolioContext.Provider value={{ data, updateProfile, updateArtefak, updateModelGuru, addLampiran, removeLampiran, reorderLampiran, saving, completionPercent, loadPortfolio }}>
+    <PortfolioContext.Provider value={{ data, slug, updateProfile, updateArtefak, updateModelGuru, addLampiran, removeLampiran, reorderLampiran, saving, completionPercent, loadPortfolio }}>
       {children}
     </PortfolioContext.Provider>
   );
