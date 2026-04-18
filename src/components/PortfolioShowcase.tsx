@@ -3,7 +3,7 @@ import { PortfolioData, KATEGORI_LABEL, ArtefakItem } from '@/contexts/Portfolio
 import {
   AlertTriangle, BookOpen, CheckCircle, RefreshCw, FileText, Image as ImageIcon, GraduationCap,
   ChevronDown, Heart, TrendingUp, AlertCircle as AlertCircleIcon, Target, Sparkles, Quote, MapPin,
-  FileSearch, FlaskConical, Award,
+  FileSearch, FlaskConical, Award, Star,
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
