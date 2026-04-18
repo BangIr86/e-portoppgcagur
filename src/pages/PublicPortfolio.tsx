@@ -2,16 +2,61 @@ import { useEffect, useState } from 'react';
 import { useParams, Navigate } from 'react-router-dom';
 import { supabase } from '@/lib/supabase';
 import PortfolioShowcase from '@/components/PortfolioShowcase';
-import { PortfolioData } from '@/contexts/PortfolioContext';
+import { PortfolioData, ArtefakItem } from '@/contexts/PortfolioContext';
 
 const defaultPortfolio: PortfolioData = {
-  profile: { full_name: '', asal_daerah: '', asal_kampus: '', bidang_studi: '', foto_url: '', kutipan_motivasi: '', keunikan_daerah: '', inspirasi_guru: '', tujuan_profesional: '' },
-  artefak: { kendala: '', teori_pedagogi: '', faktor_keberhasilan: '', adaptasi_pembelajaran: '' },
+  profile: {
+    full_name: '', asal_daerah: '', asal_kampus: '', bidang_studi: '', foto_url: '',
+    kutipan_motivasi: '', pengantar: '', keunikan_daerah: '', inspirasi_guru: '',
+    tujuan_profesional: '', narasi_storytelling: '',
+  },
+  artefak: [],
+  reflection: {
+    pengalaman_mengajar: '', kekuatan_diri: '', kelemahan_diri: '',
+    rencana_tindak_lanjut: '', filosofi_mengajar: '',
+  },
   model_guru: { visi: '', misi: '', kompetensi: [], karakter: [] },
   lampiran: [],
 };
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+const normalizeArtefak = (raw: any): ArtefakItem[] => {
+  if (Array.isArray(raw)) {
+    return raw.map((item: any) => ({
+      id: item?.id || crypto.randomUUID(),
+      judul: item?.judul || '',
+      deskripsi: item?.deskripsi || '',
+      kategori: item?.kategori || 'dokumentasi_mengajar',
+      file_url: item?.file_url || '',
+      file_type: item?.file_type || '',
+      youtube_url: item?.youtube_url,
+      konteks: item?.konteks || '',
+      tujuan: item?.tujuan || '',
+      kelebihan: item?.kelebihan || '',
+      kekurangan: item?.kekurangan || '',
+      teori_pedagogi: item?.teori_pedagogi || '',
+      faktor_keberhasilan: item?.faktor_keberhasilan || '',
+      adaptasi_pembelajaran: item?.adaptasi_pembelajaran || '',
+    }));
+  }
+  // legacy single object
+  if (raw && typeof raw === 'object' && (raw.kendala || raw.teori_pedagogi)) {
+    return [{
+      id: crypto.randomUUID(),
+      judul: 'Artefak Pembelajaran',
+      deskripsi: '',
+      kategori: 'dokumentasi_mengajar',
+      file_url: '', file_type: '',
+      konteks: raw.kendala || '',
+      tujuan: '', kelebihan: '', kekurangan: '',
+      teori_pedagogi: raw.teori_pedagogi || '',
+      faktor_keberhasilan: raw.faktor_keberhasilan || '',
+      adaptasi_pembelajaran: raw.adaptasi_pembelajaran || '',
+    }];
+  }
+  return [];
+};
 
 const PublicPortfolio = () => {
   const { identifier } = useParams<{ identifier: string }>();
@@ -21,41 +66,26 @@ const PublicPortfolio = () => {
 
   useEffect(() => {
     const load = async () => {
-      if (!identifier) {
-        setLoading(false);
-        return;
-      }
+      if (!identifier) { setLoading(false); return; }
       const isUuid = UUID_RE.test(identifier);
 
       if (isUuid) {
-        // UUID access is private — only allow if it resolves to a slug, then redirect.
-        const { data: row } = await supabase
-          .from('portfolios')
-          .select('slug')
-          .eq('user_id', identifier)
-          .maybeSingle();
+        const { data: row } = await supabase.from('portfolios').select('slug').eq('user_id', identifier).maybeSingle();
         const rowSlug = (row as any)?.slug as string | null | undefined;
-        if (rowSlug) {
-          setRedirectSlug(rowSlug);
-          return;
-        }
-        // No slug → treat as not found (UUID URLs are disabled)
+        if (rowSlug) { setRedirectSlug(rowSlug); return; }
         setLoading(false);
         return;
       }
 
-      const { data: row } = await supabase
-        .from('portfolios')
-        .select('*')
-        .eq('slug', identifier)
-        .maybeSingle();
-
+      const { data: row } = await supabase.from('portfolios').select('*').eq('slug', identifier).maybeSingle();
       if (row) {
+        const r: any = row;
         setData({
-          profile: (row.profile_data as any) || defaultPortfolio.profile,
-          artefak: (row.artefak_data as any) || defaultPortfolio.artefak,
-          model_guru: (row.model_guru_data as any) || defaultPortfolio.model_guru,
-          lampiran: (row.lampiran_data as any) || defaultPortfolio.lampiran,
+          profile: { ...defaultPortfolio.profile, ...((r.profile_data as any) || {}) },
+          artefak: normalizeArtefak(r.artefak_data),
+          reflection: { ...defaultPortfolio.reflection, ...((r.reflection_data as any) || {}) },
+          model_guru: (r.model_guru_data as any) || defaultPortfolio.model_guru,
+          lampiran: (r.lampiran_data as any) || defaultPortfolio.lampiran,
         });
       }
       setLoading(false);

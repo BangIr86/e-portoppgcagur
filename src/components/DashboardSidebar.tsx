@@ -1,4 +1,4 @@
-import { LayoutDashboard, User, BookOpen, Paperclip, Star, Eye, LogOut } from 'lucide-react';
+import { Home, User, BookOpen, FileSearch, Heart, Star, Paperclip, Eye, LogOut, LayoutDashboard } from 'lucide-react';
 import { NavLink } from '@/components/NavLink';
 import { useAuth } from '@/contexts/AuthContext';
 import { usePortfolio } from '@/contexts/PortfolioContext';
@@ -20,10 +20,13 @@ import { Button } from '@/components/ui/button';
 
 const menuItems = [
   { title: 'Dashboard', url: '/dashboard', icon: LayoutDashboard },
+  { title: 'Beranda', url: '/dashboard/beranda', icon: Home },
   { title: 'Profil Mahasiswa', url: '/dashboard/profil', icon: User },
-  { title: 'Analisis Artefak', url: '/dashboard/artefak', icon: BookOpen },
-  { title: 'Lampiran', url: '/dashboard/lampiran', icon: Paperclip },
+  { title: 'Artefak Mengajar', url: '/dashboard/artefak', icon: BookOpen },
+  { title: 'Analisis Artefak', url: '/dashboard/analisis', icon: FileSearch },
+  { title: 'Refleksi Diri', url: '/dashboard/refleksi', icon: Heart },
   { title: 'Model Guru', url: '/dashboard/model-guru', icon: Star },
+  { title: 'Lampiran Penilaian', url: '/dashboard/lampiran', icon: Paperclip },
   { title: 'Preview Portfolio', url: '/dashboard/preview', icon: Eye },
 ];
 
@@ -64,7 +67,7 @@ export const DashboardSidebar = () => {
 
         {!collapsed && (
           <SidebarGroup>
-            <SidebarGroupLabel className="text-sidebar-foreground/60">Kelengkapan</SidebarGroupLabel>
+            <SidebarGroupLabel className="text-sidebar-foreground/60">Kelengkapan Rubrik</SidebarGroupLabel>
             <SidebarGroupContent className="px-3">
               <Progress value={completionPercent} className="h-2" />
               <p className="text-xs text-sidebar-foreground/50 mt-1">{completionPercent}% selesai</p>
