@@ -1,0 +1,1 @@
+ALTER TABLE public.portfolios ADD COLUMN IF NOT EXISTS reflection_data jsonb DEFAULT '{}'::jsonb;
