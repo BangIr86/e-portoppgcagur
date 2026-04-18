@@ -1,8 +1,13 @@
 import { motion } from 'framer-motion';
-import { PortfolioData } from '@/contexts/PortfolioContext';
-import { AlertTriangle, BookOpen, CheckCircle, RefreshCw, FileText, Image as ImageIcon, GraduationCap, ChevronDown } from 'lucide-react';
+import { PortfolioData, KATEGORI_LABEL, ArtefakItem } from '@/contexts/PortfolioContext';
+import {
+  AlertTriangle, BookOpen, CheckCircle, RefreshCw, FileText, Image as ImageIcon, GraduationCap,
+  ChevronDown, Heart, TrendingUp, AlertCircle as AlertCircleIcon, Target, Sparkles, Quote, MapPin,
+  FileSearch, FlaskConical, Award,
+} from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
-import { useState } from 'react';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { Button } from '@/components/ui/button';
 
 const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: 'easeOut' } } };
 const staggerContainer = { hidden: {}, visible: { transition: { staggerChildren: 0.12 } } };
@@ -11,150 +16,181 @@ interface Props {
   data: PortfolioData;
 }
 
+const ANALISIS_FIELDS: { key: keyof ArtefakItem; label: string; icon: any }[] = [
+  { key: 'konteks', label: 'Konteks', icon: MapPin },
+  { key: 'tujuan', label: 'Tujuan', icon: Target },
+  { key: 'kelebihan', label: 'Kelebihan', icon: CheckCircle },
+  { key: 'kekurangan', label: 'Kekurangan', icon: AlertTriangle },
+  { key: 'teori_pedagogi', label: 'Teori Pedagogi', icon: BookOpen },
+  { key: 'faktor_keberhasilan', label: 'Faktor Keberhasilan', icon: Award },
+  { key: 'adaptasi_pembelajaran', label: 'Adaptasi Pembelajaran', icon: RefreshCw },
+];
+
 const PortfolioShowcase = ({ data }: Props) => {
   const p = data.profile;
   const a = data.artefak;
+  const r = data.reflection;
   const m = data.model_guru;
-  const [expandedCard, setExpandedCard] = useState<string | null>(null);
+
+  // Group artefak by kategori
+  const artefakByKategori = a.reduce((acc, item) => {
+    (acc[item.kategori] ||= []).push(item);
+    return acc;
+  }, {} as Record<string, ArtefakItem[]>);
+
+  // Lampiran 7 & 8 highlight
+  const lampiran7 = data.lampiran.filter(l => l.tipe === 'lampiran7');
+  const lampiran8 = data.lampiran.filter(l => l.tipe === 'lampiran8');
+  const lampiranOther = data.lampiran.filter(l => !['lampiran7', 'lampiran8'].includes(l.tipe));
 
   return (
     <div className="min-h-screen bg-background w-full max-w-full overflow-hidden">
-      {/* HERO */}
-      <section className="showcase-hero text-primary-foreground py-12 sm:py-20 px-4 sm:px-6">
+      {/* HERO BERANDA */}
+      <section id="beranda" className="showcase-hero text-primary-foreground py-12 sm:py-24 px-4 sm:px-6">
         <div className="max-w-4xl mx-auto text-center">
-          <motion.div initial="hidden" animate="visible" variants={fadeUp} transition={{ duration: 0.6 }}>
+          <motion.div initial="hidden" animate="visible" variants={fadeUp}>
             {p.foto_url && (
-              <img src={p.foto_url} alt={p.full_name} className="w-20 h-20 sm:w-28 sm:h-28 rounded-full mx-auto mb-4 sm:mb-6 border-4 border-primary-foreground/30 object-cover" />
+              <img src={p.foto_url} alt={p.full_name} className="w-24 h-24 sm:w-32 sm:h-32 rounded-full mx-auto mb-5 sm:mb-6 border-4 border-primary-foreground/30 object-cover" />
             )}
-            <p className="text-xs sm:text-sm uppercase tracking-widest opacity-80 mb-2">Mahasiswa PPG Prajabatan</p>
-            <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold mb-3 break-words">{p.full_name || 'Nama Mahasiswa'}</h1>
-            <p className="opacity-80 mb-4 sm:mb-6 text-sm sm:text-base break-words">{p.asal_daerah && `${p.asal_daerah} • `}{p.asal_kampus} • {p.bidang_studi}</p>
+            <p className="text-xs sm:text-sm uppercase tracking-widest opacity-80 mb-2">Mahasiswa PPG Prajabatan Informatika</p>
+            <h1 className="text-3xl sm:text-5xl md:text-6xl font-bold mb-4 break-words">{p.full_name || 'Nama Mahasiswa'}</h1>
+            {(p.asal_daerah || p.asal_kampus) && (
+              <p className="opacity-80 mb-6 text-sm sm:text-base break-words flex items-center justify-center gap-2 flex-wrap">
+                {p.asal_daerah && <span className="inline-flex items-center gap-1"><MapPin className="w-4 h-4" />{p.asal_daerah}</span>}
+                {p.asal_daerah && p.asal_kampus && <span className="opacity-50">•</span>}
+                {p.asal_kampus && <span>{p.asal_kampus}</span>}
+              </p>
+            )}
             {p.kutipan_motivasi && (
-              <blockquote className="text-base sm:text-xl md:text-2xl italic font-light max-w-2xl mx-auto leading-relaxed opacity-90 break-words">
-                "{p.kutipan_motivasi}"
+              <blockquote className="relative text-base sm:text-xl md:text-2xl italic font-light max-w-2xl mx-auto leading-relaxed opacity-95 break-words mb-8">
+                <Quote className="w-8 h-8 absolute -top-3 -left-2 opacity-30" />
+                <span className="relative">"{p.kutipan_motivasi}"</span>
               </blockquote>
             )}
-            <a href="#profil" className="inline-flex items-center gap-2 mt-6 sm:mt-8 px-6 py-3 rounded-full bg-primary-foreground/20 hover:bg-primary-foreground/30 transition-colors text-sm font-medium">
-              Lihat Portofolio <ChevronDown className="w-4 h-4" />
-            </a>
+            <div className="flex flex-wrap items-center justify-center gap-3">
+              <a href="#profil" className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-primary-foreground text-primary hover:bg-primary-foreground/90 transition-colors text-sm font-semibold">
+                Lihat Portfolio <ChevronDown className="w-4 h-4" />
+              </a>
+              <button onClick={() => window.print()} className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border-2 border-primary-foreground/40 hover:bg-primary-foreground/10 transition-colors text-sm font-medium">
+                Download PDF
+              </button>
+            </div>
           </motion.div>
         </div>
       </section>
 
-      {/* PROFIL / STORY */}
-      <section id="profil" className="py-10 sm:py-16 px-4 sm:px-6">
-        <div className="max-w-5xl mx-auto">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} transition={{ duration: 0.6 }}>
-            <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-6 sm:mb-10 text-center">Profil & Cerita Saya</h2>
+      {/* PENGANTAR */}
+      {p.pengantar && (
+        <section className="py-10 sm:py-14 px-4 sm:px-6">
+          <div className="max-w-3xl mx-auto">
+            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
+              <p className="text-base sm:text-lg text-muted-foreground leading-relaxed whitespace-pre-line text-center">{p.pengantar}</p>
+            </motion.div>
+          </div>
+        </section>
+      )}
+
+      {/* PROFIL — STORYTELLING */}
+      <section id="profil" className="py-10 sm:py-16 px-4 sm:px-6 bg-muted/30">
+        <div className="max-w-3xl mx-auto">
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
+            <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-2 text-center">Profil Mahasiswa</h2>
+            <p className="text-sm text-muted-foreground text-center mb-8 sm:mb-12">Cerita perjalanan menjadi calon guru profesional</p>
           </motion.div>
-          <div className="grid md:grid-cols-2 gap-10">
-            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} transition={{ duration: 0.6, delay: 0.1 }} className="space-y-6">
+
+          {p.narasi_storytelling ? (
+            <motion.article initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}
+              className="prose prose-lg max-w-none text-foreground leading-relaxed">
+              {p.narasi_storytelling.split(/\n\n+/).map((para, i) => (
+                <p key={i} className="text-base sm:text-lg leading-relaxed mb-5 text-foreground/90 whitespace-pre-line">{para}</p>
+              ))}
+            </motion.article>
+          ) : (
+            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="space-y-8">
               {p.keunikan_daerah && (
                 <div>
-                  <h3 className="text-lg font-semibold text-foreground mb-2">🏡 Keunikan Daerah Asal</h3>
-                  <p className="text-muted-foreground leading-relaxed whitespace-pre-line">{p.keunikan_daerah}</p>
+                  <h3 className="text-lg font-semibold text-foreground mb-2 flex items-center gap-2"><MapPin className="w-5 h-5 text-primary" /> Keunikan Daerah Asal</h3>
+                  <p className="text-base text-foreground/85 leading-relaxed whitespace-pre-line">{p.keunikan_daerah}</p>
                 </div>
               )}
               {p.inspirasi_guru && (
                 <div>
-                  <h3 className="text-lg font-semibold text-foreground mb-2">💡 Inspirasi Menjadi Guru</h3>
-                  <p className="text-muted-foreground leading-relaxed whitespace-pre-line">{p.inspirasi_guru}</p>
+                  <h3 className="text-lg font-semibold text-foreground mb-2 flex items-center gap-2"><Sparkles className="w-5 h-5 text-primary" /> Inspirasi Menjadi Guru</h3>
+                  <p className="text-base text-foreground/85 leading-relaxed whitespace-pre-line">{p.inspirasi_guru}</p>
                 </div>
               )}
-            </motion.div>
-            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} transition={{ duration: 0.6, delay: 0.2 }} className="space-y-6">
               {p.tujuan_profesional && (
                 <div>
-                  <h3 className="text-lg font-semibold text-foreground mb-2">🎯 Tujuan Profesional</h3>
-                  <p className="text-muted-foreground leading-relaxed whitespace-pre-line">{p.tujuan_profesional}</p>
+                  <h3 className="text-lg font-semibold text-foreground mb-2 flex items-center gap-2"><Target className="w-5 h-5 text-primary" /> Tujuan Profesional</h3>
+                  <p className="text-base text-foreground/85 leading-relaxed whitespace-pre-line">{p.tujuan_profesional}</p>
                 </div>
               )}
-              <div className="p-6 rounded-xl bg-muted/50">
-                <GraduationCap className="w-8 h-8 text-primary mb-3" />
-                <p className="text-sm text-muted-foreground"><strong className="text-foreground">{p.asal_kampus}</strong><br />{p.bidang_studi}</p>
+            </motion.div>
+          )}
+
+          {(p.asal_kampus || p.bidang_studi) && (
+            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}
+              className="mt-10 p-6 rounded-xl bg-card border card-shadow flex items-start gap-4">
+              <GraduationCap className="w-8 h-8 text-primary shrink-0" />
+              <div>
+                <p className="font-semibold text-foreground">{p.asal_kampus}</p>
+                <p className="text-sm text-muted-foreground">{p.bidang_studi}</p>
               </div>
             </motion.div>
-          </div>
+          )}
         </div>
       </section>
 
-      {/* ARTEFAK */}
-      <section className="py-10 sm:py-16 px-4 sm:px-6 bg-muted/30">
-        <div className="max-w-5xl mx-auto">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
-            <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-6 sm:mb-10 text-center">Analisis Artefak Pembelajaran</h2>
-          </motion.div>
-          <motion.div className="grid md:grid-cols-2 gap-6" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={staggerContainer}>
-            {[
-              { key: 'kendala', label: 'Kendala', icon: AlertTriangle, text: a.kendala },
-              { key: 'teori_pedagogi', label: 'Teori Pedagogi', icon: BookOpen, text: a.teori_pedagogi },
-              { key: 'faktor_keberhasilan', label: 'Faktor Keberhasilan', icon: CheckCircle, text: a.faktor_keberhasilan },
-              { key: 'adaptasi_pembelajaran', label: 'Adaptasi Pembelajaran', icon: RefreshCw, text: a.adaptasi_pembelajaran },
-            ].map((item) => (
-              <motion.div key={item.key} variants={fadeUp}>
-                <div
-                  className="p-6 rounded-xl bg-card card-shadow hover:card-shadow-hover transition-all cursor-pointer"
-                  onClick={() => setExpandedCard(expandedCard === item.key ? null : item.key)}
-                >
-                  <item.icon className="w-8 h-8 text-primary mb-3" />
-                  <h3 className="font-semibold text-foreground mb-2">{item.label}</h3>
-                  <p className={`text-sm text-muted-foreground leading-relaxed whitespace-pre-line ${expandedCard === item.key ? '' : 'line-clamp-3'}`}>
-                    {item.text || 'Belum diisi'}
-                  </p>
-                  {item.text && item.text.length > 150 && (
-                    <p className="text-xs text-primary mt-2 font-medium">{expandedCard === item.key ? 'Tutup' : 'Baca selengkapnya'}</p>
-                  )}
-                </div>
-              </motion.div>
-            ))}
-          </motion.div>
-        </div>
-      </section>
-
-      {/* LAMPIRAN */}
-      {data.lampiran.length > 0 && (
-        <section className="py-10 sm:py-16 px-4 sm:px-6">
+      {/* ARTEFAK MENGAJAR */}
+      {a.length > 0 && (
+        <section id="artefak" className="py-10 sm:py-16 px-4 sm:px-6">
           <div className="max-w-5xl mx-auto">
-            <motion.div initial="hidden" animate="visible" variants={fadeUp}>
-              <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-6 sm:mb-10 text-center">Lampiran</h2>
+            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
+              <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-2 text-center">Artefak Mengajar</h2>
+              <p className="text-sm text-muted-foreground text-center mb-8 sm:mb-12">Dokumentasi karya pembelajaran berdasarkan kategori</p>
             </motion.div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 auto-rows-fr">
-              {data.lampiran.map((item, index) => (
-                <motion.div key={item.id} initial="hidden" animate="visible" variants={fadeUp} transition={{ delay: index * 0.1 }} className="h-full">
-                  <div className="rounded-lg bg-card card-shadow overflow-hidden h-full flex flex-col">
-                    {/* Media area — uniform aspect ratio so left/right match */}
-                    <div className="aspect-video w-full bg-muted/30 shrink-0">
-                      {item.file_type === 'youtube' && item.youtube_url && (
-                        <iframe
-                          src={`https://www.youtube.com/embed/${item.youtube_url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([a-zA-Z0-9_-]{11})/)?.[1] || ''}`}
-                          className="w-full h-full"
-                          allowFullScreen
-                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        />
-                      )}
-                      {item.file_type === 'image' && (
-                        <a href={item.file_url} target="_blank" rel="noopener noreferrer" className="block w-full h-full">
-                          <img src={item.file_url} alt={item.judul || item.nama} className="w-full h-full object-cover" />
-                        </a>
-                      )}
-                      {item.file_type === 'pdf' && item.file_url && (
-                        <iframe src={`${item.file_url}#toolbar=0&navpanes=0`} className="w-full h-full" title={item.judul || item.nama} />
-                      )}
-                    </div>
-                    {/* Info bar */}
-                    <a href={item.file_type === 'youtube' ? (item.youtube_url || '#') : item.file_url} target="_blank" rel="noopener noreferrer"
-                      className="flex items-center gap-3 p-4 hover:bg-muted/50 transition-colors mt-auto">
-                      {item.file_type === 'image' ? <ImageIcon className="w-5 h-5 text-primary shrink-0" /> :
-                       item.file_type === 'youtube' ? <span className="text-lg shrink-0">▶️</span> :
-                       <FileText className="w-5 h-5 text-primary shrink-0" />}
-                      <div className="min-w-0">
-                        <p className="text-sm font-medium text-foreground truncate">{item.judul || item.nama}</p>
-                        {item.judul && item.judul !== item.nama && (
-                          <p className="text-xs text-muted-foreground truncate">{item.nama}</p>
-                        )}
-                      </div>
-                    </a>
-                  </div>
+
+            <div className="space-y-10">
+              {Object.entries(artefakByKategori).map(([kat, items]) => (
+                <motion.div key={kat} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
+                  <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2">
+                    <span className="w-1 h-5 bg-primary rounded-full" />
+                    {KATEGORI_LABEL[kat as keyof typeof KATEGORI_LABEL]}
+                    <Badge variant="secondary" className="ml-1">{items.length}</Badge>
+                  </h3>
+                  <motion.div className="grid grid-cols-1 sm:grid-cols-2 gap-5 auto-rows-fr" variants={staggerContainer}>
+                    {items.map(item => (
+                      <motion.div key={item.id} variants={fadeUp} className="h-full">
+                        <div className="rounded-xl bg-card border card-shadow overflow-hidden h-full flex flex-col">
+                          <div className="aspect-video w-full bg-muted/30 shrink-0">
+                            {item.file_type === 'youtube' && item.youtube_url && (
+                              <iframe
+                                src={`https://www.youtube.com/embed/${item.youtube_url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([a-zA-Z0-9_-]{11})/)?.[1] || ''}`}
+                                className="w-full h-full" allowFullScreen
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" />
+                            )}
+                            {item.file_type === 'image' && item.file_url && (
+                              <a href={item.file_url} target="_blank" rel="noopener noreferrer" className="block w-full h-full">
+                                <img src={item.file_url} alt={item.judul} className="w-full h-full object-cover" />
+                              </a>
+                            )}
+                            {item.file_type === 'pdf' && item.file_url && (
+                              <iframe src={`${item.file_url}#toolbar=0&navpanes=0`} className="w-full h-full" title={item.judul} />
+                            )}
+                            {!item.file_url && (
+                              <div className="w-full h-full flex items-center justify-center text-muted-foreground/50">
+                                <FileText className="w-10 h-10" />
+                              </div>
+                            )}
+                          </div>
+                          <div className="p-4 flex-1 flex flex-col">
+                            <p className="font-semibold text-foreground mb-1">{item.judul || 'Tanpa judul'}</p>
+                            {item.deskripsi && <p className="text-sm text-muted-foreground leading-relaxed">{item.deskripsi}</p>}
+                          </div>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </motion.div>
                 </motion.div>
               ))}
             </div>
@@ -162,72 +198,232 @@ const PortfolioShowcase = ({ data }: Props) => {
         </section>
       )}
 
-      {/* MODEL GURU */}
-      <section className="py-10 sm:py-16 px-4 sm:px-6 bg-muted/30">
-        <div className="max-w-5xl mx-auto">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
-            <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-6 sm:mb-10 text-center">Model Guru yang Dituju</h2>
-          </motion.div>
-
-          {m.visi && (
-            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="text-center mb-10">
-              <p className="text-2xl font-bold text-primary max-w-2xl mx-auto">"{m.visi}"</p>
+      {/* ANALISIS ARTEFAK */}
+      {a.some(item => ANALISIS_FIELDS.some(f => (item as any)[f.key])) && (
+        <section id="analisis" className="py-10 sm:py-16 px-4 sm:px-6 bg-muted/30">
+          <div className="max-w-4xl mx-auto">
+            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
+              <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-2 text-center flex items-center justify-center gap-3">
+                <FileSearch className="w-7 h-7 text-primary" /> Analisis Artefak
+              </h2>
+              <p className="text-sm text-muted-foreground text-center mb-8 sm:mb-12">Analisis mendalam 7 dimensi untuk setiap artefak</p>
             </motion.div>
-          )}
 
-          <div className="grid md:grid-cols-2 gap-8">
-            {m.misi && (
-              <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
-                <h3 className="font-semibold text-foreground mb-4">Misi</h3>
-                <ul className="space-y-2">
-                  {m.misi.split('\n').filter(Boolean).map((line, i) => (
-                    <li key={i} className="flex items-start gap-2 text-muted-foreground">
-                      <span className="w-1.5 h-1.5 rounded-full bg-primary mt-2 shrink-0" />
-                      {line}
-                    </li>
-                  ))}
-                </ul>
+            <Accordion type="multiple" className="space-y-3">
+              {a.map(item => (
+                <AccordionItem key={item.id} value={item.id} className="border rounded-xl bg-card card-shadow data-[state=open]:shadow-md">
+                  <AccordionTrigger className="px-5 py-4 hover:no-underline">
+                    <div className="text-left flex-1 min-w-0">
+                      <p className="font-semibold text-foreground truncate">{item.judul || 'Artefak tanpa judul'}</p>
+                      <p className="text-xs text-muted-foreground">{KATEGORI_LABEL[item.kategori]}</p>
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent className="px-5 pb-5 space-y-5">
+                    {ANALISIS_FIELDS.map(f => {
+                      const val = (item as any)[f.key];
+                      if (!val) return null;
+                      return (
+                        <div key={f.key} className="border-l-2 border-primary/40 pl-4">
+                          <h4 className="font-semibold text-foreground mb-1.5 flex items-center gap-2">
+                            <f.icon className="w-4 h-4 text-primary" /> {f.label}
+                          </h4>
+                          <p className="text-sm sm:text-base text-foreground/85 leading-relaxed whitespace-pre-line">{val}</p>
+                        </div>
+                      );
+                    })}
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
+          </div>
+        </section>
+      )}
+
+      {/* REFLEKSI DIRI */}
+      {(r.pengalaman_mengajar || r.kekuatan_diri || r.kelemahan_diri || r.rencana_tindak_lanjut || r.filosofi_mengajar) && (
+        <section id="refleksi" className="py-10 sm:py-16 px-4 sm:px-6">
+          <div className="max-w-4xl mx-auto">
+            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
+              <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-2 text-center flex items-center justify-center gap-3">
+                <Heart className="w-7 h-7 text-primary" /> Refleksi Diri
+              </h2>
+              <p className="text-sm text-muted-foreground text-center mb-8 sm:mb-12">Refleksi mendalam atas perjalanan menjadi guru profesional</p>
+            </motion.div>
+
+            <motion.div className="grid grid-cols-1 md:grid-cols-2 gap-5" variants={staggerContainer} initial="hidden" whileInView="visible" viewport={{ once: true }}>
+              {r.pengalaman_mengajar && (
+                <motion.div variants={fadeUp} className="md:col-span-2 p-6 rounded-xl bg-primary/5 border-2 border-primary/20">
+                  <h3 className="font-semibold text-foreground mb-3 flex items-center gap-2"><Heart className="w-5 h-5 text-primary" /> Refleksi Pengalaman Mengajar</h3>
+                  <p className="text-foreground/85 leading-relaxed whitespace-pre-line">{r.pengalaman_mengajar}</p>
+                </motion.div>
+              )}
+              {r.kekuatan_diri && (
+                <motion.div variants={fadeUp} className="p-6 rounded-xl bg-card border card-shadow">
+                  <h3 className="font-semibold text-foreground mb-3 flex items-center gap-2"><TrendingUp className="w-5 h-5 text-emerald-500" /> Kekuatan Diri</h3>
+                  <p className="text-foreground/85 leading-relaxed whitespace-pre-line">{r.kekuatan_diri}</p>
+                </motion.div>
+              )}
+              {r.kelemahan_diri && (
+                <motion.div variants={fadeUp} className="p-6 rounded-xl bg-card border card-shadow">
+                  <h3 className="font-semibold text-foreground mb-3 flex items-center gap-2"><AlertCircleIcon className="w-5 h-5 text-amber-500" /> Kelemahan Diri</h3>
+                  <p className="text-foreground/85 leading-relaxed whitespace-pre-line">{r.kelemahan_diri}</p>
+                </motion.div>
+              )}
+              {r.rencana_tindak_lanjut && (
+                <motion.div variants={fadeUp} className="md:col-span-2 p-6 rounded-xl bg-card border card-shadow">
+                  <h3 className="font-semibold text-foreground mb-3 flex items-center gap-2"><Target className="w-5 h-5 text-primary" /> Rencana Tindak Lanjut</h3>
+                  <p className="text-foreground/85 leading-relaxed whitespace-pre-line">{r.rencana_tindak_lanjut}</p>
+                </motion.div>
+              )}
+              {r.filosofi_mengajar && (
+                <motion.div variants={fadeUp} className="md:col-span-2 p-7 rounded-xl border-l-4 border-primary bg-gradient-to-br from-primary/5 to-transparent">
+                  <h3 className="font-semibold text-foreground mb-3 flex items-center gap-2"><Sparkles className="w-5 h-5 text-violet-500" /> Filosofi Mengajar</h3>
+                  <p className="text-lg italic text-foreground/90 leading-relaxed whitespace-pre-line">"{r.filosofi_mengajar}"</p>
+                </motion.div>
+              )}
+            </motion.div>
+          </div>
+        </section>
+      )}
+
+      {/* MODEL GURU */}
+      {(m.visi || m.misi || m.kompetensi.length > 0 || m.karakter.length > 0) && (
+        <section id="model-guru" className="py-10 sm:py-16 px-4 sm:px-6 bg-muted/30">
+          <div className="max-w-5xl mx-auto">
+            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
+              <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-2 text-center flex items-center justify-center gap-3">
+                <Star className="w-7 h-7 text-primary" /> Model Guru yang Dituju
+              </h2>
+              <p className="text-sm text-muted-foreground text-center mb-8 sm:mb-12">Visi, misi, kompetensi, dan karakter sebagai calon guru profesional</p>
+            </motion.div>
+
+            {m.visi && (
+              <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="text-center mb-12">
+                <p className="text-xs uppercase tracking-widest text-muted-foreground mb-3">Visi</p>
+                <p className="text-2xl sm:text-3xl md:text-4xl font-bold text-primary max-w-3xl mx-auto leading-tight">"{m.visi}"</p>
               </motion.div>
             )}
 
-            {m.kompetensi.length > 0 && (
-              <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
-                <h3 className="font-semibold text-foreground mb-4">Kompetensi</h3>
-                <div className="space-y-3">
-                  {m.kompetensi.map((k, i) => (
-                    <div key={i}>
-                      <div className="flex justify-between text-sm mb-1">
-                        <span className="text-foreground">{k.nama}</span>
-                        <span className="text-muted-foreground">{k.level}%</span>
+            <div className="grid md:grid-cols-2 gap-8">
+              {m.misi && (
+                <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="p-6 rounded-xl bg-card border card-shadow">
+                  <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2"><Target className="w-5 h-5 text-primary" /> Misi</h3>
+                  <ul className="space-y-2.5">
+                    {m.misi.split('\n').filter(Boolean).map((line, i) => (
+                      <li key={i} className="flex items-start gap-3 text-foreground/85">
+                        <span className="w-6 h-6 rounded-full bg-primary/10 text-primary text-xs font-semibold flex items-center justify-center mt-0.5 shrink-0">{i + 1}</span>
+                        <span className="leading-relaxed">{line}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </motion.div>
+              )}
+
+              {m.kompetensi.length > 0 && (
+                <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="p-6 rounded-xl bg-card border card-shadow">
+                  <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2"><FlaskConical className="w-5 h-5 text-primary" /> Kompetensi</h3>
+                  <div className="space-y-4">
+                    {m.kompetensi.map((k, i) => (
+                      <div key={i}>
+                        <div className="flex justify-between text-sm mb-1.5">
+                          <span className="text-foreground font-medium">{k.nama}</span>
+                          <span className="text-muted-foreground">{k.level}%</span>
+                        </div>
+                        <div className="h-2.5 bg-muted rounded-full overflow-hidden">
+                          <motion.div className="h-full hero-gradient rounded-full" initial={{ width: 0 }} whileInView={{ width: `${k.level}%` }} viewport={{ once: true }} transition={{ duration: 1, delay: i * 0.1 }} />
+                        </div>
                       </div>
-                      <div className="h-2 bg-muted rounded-full overflow-hidden">
-                        <motion.div className="h-full hero-gradient rounded-full" initial={{ width: 0 }} whileInView={{ width: `${k.level}%` }} viewport={{ once: true }} transition={{ duration: 1, delay: i * 0.1 }} />
-                      </div>
-                    </div>
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+            </div>
+
+            {m.karakter.length > 0 && (
+              <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="mt-10 text-center">
+                <h3 className="font-semibold text-foreground mb-4 flex items-center justify-center gap-2"><Award className="w-5 h-5 text-primary" /> Karakter</h3>
+                <div className="flex flex-wrap justify-center gap-2.5">
+                  {m.karakter.map((k, i) => (
+                    <Badge key={i} variant="secondary" className="px-4 py-2 text-sm font-medium">{k}</Badge>
                   ))}
                 </div>
               </motion.div>
             )}
           </div>
+        </section>
+      )}
 
-          {m.karakter.length > 0 && (
-            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="mt-8 text-center">
-              <h3 className="font-semibold text-foreground mb-4">Karakter</h3>
-              <div className="flex flex-wrap justify-center gap-2">
-                {m.karakter.map((k, i) => (
-                  <Badge key={i} variant="secondary" className="px-4 py-1.5 text-sm">{k}</Badge>
-                ))}
-              </div>
+      {/* LAMPIRAN PENILAIAN */}
+      {data.lampiran.length > 0 && (
+        <section id="lampiran" className="py-10 sm:py-16 px-4 sm:px-6">
+          <div className="max-w-5xl mx-auto">
+            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
+              <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-2 text-center">Lampiran Penilaian</h2>
+              <p className="text-sm text-muted-foreground text-center mb-8 sm:mb-12">Dokumen pendukung dan lampiran wajib</p>
             </motion.div>
-          )}
-        </div>
-      </section>
+
+            {[
+              { tipe: 'lampiran7', label: 'Lampiran 7', items: lampiran7 },
+              { tipe: 'lampiran8', label: 'Lampiran 8', items: lampiran8 },
+              { tipe: 'lampiran', label: 'Lampiran Pendukung', items: lampiranOther },
+            ].filter(g => g.items.length > 0).map(group => (
+              <div key={group.tipe} className="mb-10">
+                <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2">
+                  <span className="w-1 h-5 bg-primary rounded-full" />
+                  {group.label}
+                  <Badge variant="secondary">{group.items.length}</Badge>
+                </h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 auto-rows-fr">
+                  {group.items.map((item, index) => (
+                    <motion.div key={item.id} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} transition={{ delay: index * 0.08 }} className="h-full">
+                      <div className="rounded-xl bg-card border card-shadow overflow-hidden h-full flex flex-col">
+                        <div className="aspect-video w-full bg-muted/30 shrink-0">
+                          {item.file_type === 'youtube' && item.youtube_url && (
+                            <iframe
+                              src={`https://www.youtube.com/embed/${item.youtube_url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([a-zA-Z0-9_-]{11})/)?.[1] || ''}`}
+                              className="w-full h-full" allowFullScreen
+                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" />
+                          )}
+                          {item.file_type === 'image' && (
+                            <a href={item.file_url} target="_blank" rel="noopener noreferrer" className="block w-full h-full">
+                              <img src={item.file_url} alt={item.judul || item.nama} className="w-full h-full object-cover" />
+                            </a>
+                          )}
+                          {item.file_type === 'pdf' && item.file_url && (
+                            <iframe src={`${item.file_url}#toolbar=0&navpanes=0`} className="w-full h-full" title={item.judul || item.nama} />
+                          )}
+                          {!['image', 'youtube', 'pdf'].includes(item.file_type) && (
+                            <div className="w-full h-full flex items-center justify-center">
+                              <FileText className="w-12 h-12 text-muted-foreground/40" />
+                            </div>
+                          )}
+                        </div>
+                        <a href={item.file_type === 'youtube' ? (item.youtube_url || '#') : item.file_url} target="_blank" rel="noopener noreferrer"
+                          className="flex items-center gap-3 p-4 hover:bg-muted/50 transition-colors mt-auto">
+                          {item.file_type === 'image' ? <ImageIcon className="w-5 h-5 text-primary shrink-0" /> :
+                           item.file_type === 'youtube' ? <span className="text-lg shrink-0">▶️</span> :
+                           <FileText className="w-5 h-5 text-primary shrink-0" />}
+                          <div className="min-w-0">
+                            <p className="text-sm font-medium text-foreground truncate">{item.judul || item.nama}</p>
+                          </div>
+                        </a>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* FOOTER */}
       <footer className="py-10 px-6 text-center bg-foreground text-background">
         <p className="font-semibold text-lg">{p.full_name || 'Nama Mahasiswa'}</p>
-        <p className="text-sm opacity-70 mt-1">Program PPG Prajabatan • {new Date().getFullYear()}</p>
-        <p className="text-xs opacity-50 mt-1">{p.asal_kampus} — {p.bidang_studi}</p>
+        <p className="text-sm opacity-70 mt-1">Program PPG Prajabatan Informatika • {new Date().getFullYear()}</p>
+        {(p.asal_kampus || p.bidang_studi) && (
+          <p className="text-xs opacity-50 mt-1">{p.asal_kampus}{p.asal_kampus && p.bidang_studi && ' — '}{p.bidang_studi}</p>
+        )}
       </footer>
     </div>
   );
