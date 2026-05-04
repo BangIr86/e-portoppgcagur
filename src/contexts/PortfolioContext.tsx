@@ -321,6 +321,20 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const removeLampiran = (id: string) => autoSave({ ...data, lampiran: data.lampiran.filter(l => l.id !== id) });
   const reorderLampiran = (items: LampiranItem[]) => autoSave({ ...data, lampiran: items });
 
+  const updateTheme = useCallback(async (themeId: string) => {
+    if (!user) return;
+    themeRef.current = themeId;
+    setTheme(themeId);
+    setSaving(true);
+    try {
+      await supabase.from('portfolios').update({ theme: themeId, updated_at: new Date().toISOString() } as any).eq('user_id', user.id);
+    } catch {
+      toast.error('Gagal menyimpan tema');
+    } finally {
+      setSaving(false);
+    }
+  }, [user]);
+
   // ============ STATUS RUBRIK ============
   const sectionStatus: SectionStatus = (() => {
     const p = data.profile;
