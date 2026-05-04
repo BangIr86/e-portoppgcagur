@@ -19,6 +19,7 @@ import RefleksiForm from "./pages/dashboard/RefleksiForm";
 import LampiranForm from "./pages/dashboard/LampiranForm";
 import ModelGuruForm from "./pages/dashboard/ModelGuruForm";
 import PreviewPage from "./pages/dashboard/PreviewPage";
+import TemaPage from "./pages/dashboard/TemaPage";
 import PublicPortfolio from "./pages/PublicPortfolio";
 import NotFound from "./pages/NotFound";
 
@@ -46,6 +47,7 @@ const App = () => (
               <Route path="refleksi" element={<RefleksiForm />} />
               <Route path="model-guru" element={<ModelGuruForm />} />
               <Route path="lampiran" element={<LampiranForm />} />
+              <Route path="tema" element={<TemaPage />} />
               <Route path="preview" element={<PreviewPage />} />
             </Route>
             <Route path="/portfolio/:identifier" element={<PublicPortfolio />} />
