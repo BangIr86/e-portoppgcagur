@@ -9,7 +9,7 @@ import ShareDialog from '@/components/ShareDialog';
 
 const PreviewPage = () => {
   const { user } = useAuth();
-  const { data, slug } = usePortfolio();
+  const { data, slug, theme } = usePortfolio();
 
   return (
     <PageTransition>
@@ -39,7 +39,7 @@ const PreviewPage = () => {
         </div>
         <div className="border rounded-lg overflow-hidden bg-card -mx-2 sm:mx-0">
           <div className="overflow-x-hidden">
-            <PortfolioShowcase data={data} />
+            <PortfolioShowcase data={data} themeId={theme} />
           </div>
         </div>
       </div>

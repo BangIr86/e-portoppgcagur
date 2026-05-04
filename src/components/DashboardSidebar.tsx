@@ -1,4 +1,4 @@
-import { Home, User, BookOpen, FileSearch, Heart, Star, Paperclip, Eye, LogOut, LayoutDashboard } from 'lucide-react';
+import { Home, User, BookOpen, FileSearch, Heart, Star, Paperclip, Eye, LogOut, LayoutDashboard, Palette } from 'lucide-react';
 import { NavLink } from '@/components/NavLink';
 import { useAuth } from '@/contexts/AuthContext';
 import { usePortfolio } from '@/contexts/PortfolioContext';
@@ -27,6 +27,7 @@ const menuItems = [
   { title: 'Refleksi Diri', url: '/dashboard/refleksi', icon: Heart },
   { title: 'Model Guru', url: '/dashboard/model-guru', icon: Star },
   { title: 'Lampiran Penilaian', url: '/dashboard/lampiran', icon: Paperclip },
+  { title: 'Tema Portfolio', url: '/dashboard/tema', icon: Palette },
   { title: 'Preview Portfolio', url: '/dashboard/preview', icon: Eye },
 ];
 

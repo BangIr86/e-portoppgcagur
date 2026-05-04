@@ -61,6 +61,7 @@ const normalizeArtefak = (raw: any): ArtefakItem[] => {
 const PublicPortfolio = () => {
   const { identifier } = useParams<{ identifier: string }>();
   const [data, setData] = useState<PortfolioData | null>(null);
+  const [theme, setTheme] = useState<string>('classic-blue');
   const [loading, setLoading] = useState(true);
   const [redirectSlug, setRedirectSlug] = useState<string | null>(null);
 
@@ -87,6 +88,7 @@ const PublicPortfolio = () => {
           model_guru: (r.model_guru_data as any) || defaultPortfolio.model_guru,
           lampiran: (r.lampiran_data as any) || defaultPortfolio.lampiran,
         });
+        setTheme(r.theme || 'classic-blue');
       }
       setLoading(false);
     };
@@ -97,7 +99,7 @@ const PublicPortfolio = () => {
   if (loading) return <div className="min-h-screen flex items-center justify-center text-muted-foreground">Memuat portfolio...</div>;
   if (!data) return <div className="min-h-screen flex items-center justify-center text-muted-foreground">Portfolio tidak ditemukan.</div>;
 
-  return <PortfolioShowcase data={data} />;
+  return <PortfolioShowcase data={data} themeId={theme} />;
 };
 
 export default PublicPortfolio;

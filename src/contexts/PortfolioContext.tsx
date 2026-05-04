@@ -158,6 +158,8 @@ interface SectionStatus {
 interface PortfolioContextType {
   data: PortfolioData;
   slug: string | null;
+  theme: string;
+  updateTheme: (themeId: string) => void;
   updateProfile: (profile: Partial<ProfileData>) => void;
   addArtefak: (item: Omit<ArtefakItem, 'id'>) => string;
   updateArtefak: (id: string, patch: Partial<ArtefakItem>) => void;
@@ -182,8 +184,10 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const { user } = useAuth();
   const [data, setData] = useState<PortfolioData>(defaultPortfolio);
   const [slug, setSlug] = useState<string | null>(null);
+  const [theme, setTheme] = useState<string>('classic-blue');
   const [saving, setSaving] = useState(false);
   const slugRef = useRef<string | null>(null);
+  const themeRef = useRef<string>('classic-blue');
 
   const saveToDb = useCallback(async (newData: PortfolioData) => {
     if (!user) return;
@@ -269,6 +273,9 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         const loadedSlug = r.slug || null;
         slugRef.current = loadedSlug;
         setSlug(loadedSlug);
+        const loadedTheme = r.theme || 'classic-blue';
+        themeRef.current = loadedTheme;
+        setTheme(loadedTheme);
       }
       return loaded;
     }
@@ -314,6 +321,20 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const removeLampiran = (id: string) => autoSave({ ...data, lampiran: data.lampiran.filter(l => l.id !== id) });
   const reorderLampiran = (items: LampiranItem[]) => autoSave({ ...data, lampiran: items });
 
+  const updateTheme = useCallback(async (themeId: string) => {
+    if (!user) return;
+    themeRef.current = themeId;
+    setTheme(themeId);
+    setSaving(true);
+    try {
+      await supabase.from('portfolios').update({ theme: themeId, updated_at: new Date().toISOString() } as any).eq('user_id', user.id);
+    } catch {
+      toast.error('Gagal menyimpan tema');
+    } finally {
+      setSaving(false);
+    }
+  }, [user]);
+
   // ============ STATUS RUBRIK ============
   const sectionStatus: SectionStatus = (() => {
     const p = data.profile;
@@ -348,7 +369,7 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
   return (
     <PortfolioContext.Provider value={{
-      data, slug,
+      data, slug, theme, updateTheme,
       updateProfile,
       addArtefak, updateArtefak: updateArtefakFn, removeArtefak,
       updateReflection,
