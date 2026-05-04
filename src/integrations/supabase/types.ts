@@ -24,6 +24,7 @@ export type Database = {
           profile_data: Json | null
           reflection_data: Json | null
           slug: string | null
+          theme: string
           updated_at: string
           user_id: string
         }
@@ -36,6 +37,7 @@ export type Database = {
           profile_data?: Json | null
           reflection_data?: Json | null
           slug?: string | null
+          theme?: string
           updated_at?: string
           user_id: string
         }
@@ -48,6 +50,7 @@ export type Database = {
           profile_data?: Json | null
           reflection_data?: Json | null
           slug?: string | null
+          theme?: string
           updated_at?: string
           user_id?: string
         }

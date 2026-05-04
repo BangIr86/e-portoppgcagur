@@ -1,0 +1,1 @@
+ALTER TABLE public.portfolios ADD COLUMN IF NOT EXISTS theme text NOT NULL DEFAULT 'classic-blue';
