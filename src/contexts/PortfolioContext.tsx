@@ -158,6 +158,8 @@ interface SectionStatus {
 interface PortfolioContextType {
   data: PortfolioData;
   slug: string | null;
+  theme: string;
+  updateTheme: (themeId: string) => void;
   updateProfile: (profile: Partial<ProfileData>) => void;
   addArtefak: (item: Omit<ArtefakItem, 'id'>) => string;
   updateArtefak: (id: string, patch: Partial<ArtefakItem>) => void;
