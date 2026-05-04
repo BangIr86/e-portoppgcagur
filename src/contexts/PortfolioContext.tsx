@@ -273,6 +273,9 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         const loadedSlug = r.slug || null;
         slugRef.current = loadedSlug;
         setSlug(loadedSlug);
+        const loadedTheme = r.theme || 'classic-blue';
+        themeRef.current = loadedTheme;
+        setTheme(loadedTheme);
       }
       return loaded;
     }
