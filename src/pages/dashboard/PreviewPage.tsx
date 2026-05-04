@@ -9,7 +9,7 @@ import ShareDialog from '@/components/ShareDialog';
 
 const PreviewPage = () => {
   const { user } = useAuth();
-  const { data, slug } = usePortfolio();
+  const { data, slug, theme } = usePortfolio();
 
   return (
     <PageTransition>
