@@ -29,11 +29,14 @@ const ANALISIS_FIELDS: { key: keyof ArtefakItem; label: string; icon: any }[] = 
   { key: 'adaptasi_pembelajaran', label: 'Adaptasi Pembelajaran', icon: RefreshCw },
 ];
 
-const PortfolioShowcase = ({ data }: Props) => {
+const PortfolioShowcase = ({ data, themeId }: Props) => {
   const p = data.profile;
   const a = data.artefak;
   const r = data.reflection;
   const m = data.model_guru;
+
+  const theme = getTheme(themeId);
+  useEffect(() => { injectThemeFont(theme); }, [theme]);
 
   // Group artefak by kategori
   const artefakByKategori = a.reduce((acc, item) => {
@@ -47,7 +50,7 @@ const PortfolioShowcase = ({ data }: Props) => {
   const lampiranOther = data.lampiran.filter(l => !['lampiran7', 'lampiran8'].includes(l.tipe));
 
   return (
-    <div className="min-h-screen bg-background w-full max-w-full overflow-hidden">
+    <div style={themeToStyle(theme)} className="portfolio-themed min-h-screen bg-background text-foreground w-full max-w-full overflow-hidden">
       {/* HERO BERANDA */}
       <section id="beranda" className="showcase-hero text-primary-foreground py-12 sm:py-24 px-4 sm:px-6">
         <div className="max-w-4xl mx-auto text-center">
