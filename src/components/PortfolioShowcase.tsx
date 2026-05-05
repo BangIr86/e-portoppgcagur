@@ -9,7 +9,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Button } from '@/components/ui/button';
-import { getTheme, themeToStyle, injectThemeFont } from '@/lib/themes';
+import { getTheme, themeToStyle, injectThemeFont, resolveUppercase, type ThemeOverrides } from '@/lib/themes';
 
 const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: 'easeOut' } } };
 const staggerContainer = { hidden: {}, visible: { transition: { staggerChildren: 0.12 } } };
@@ -17,6 +17,7 @@ const staggerContainer = { hidden: {}, visible: { transition: { staggerChildren:
 interface Props {
   data: PortfolioData;
   themeId?: string;
+  themeOverrides?: ThemeOverrides;
 }
 
 const ANALISIS_FIELDS: { key: keyof ArtefakItem; label: string; icon: any }[] = [
