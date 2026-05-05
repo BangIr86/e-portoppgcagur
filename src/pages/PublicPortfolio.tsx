@@ -58,12 +58,28 @@ const normalizeArtefak = (raw: any): ArtefakItem[] => {
   return [];
 };
 
+const applyRow = (
+  r: any,
+  setData: (d: PortfolioData) => void,
+  setTheme: (t: string) => void,
+) => {
+  setData({
+    profile: { ...defaultPortfolio.profile, ...((r.profile_data as any) || {}) },
+    artefak: normalizeArtefak(r.artefak_data),
+    reflection: { ...defaultPortfolio.reflection, ...((r.reflection_data as any) || {}) },
+    model_guru: (r.model_guru_data as any) || defaultPortfolio.model_guru,
+    lampiran: (r.lampiran_data as any) || defaultPortfolio.lampiran,
+  });
+  setTheme(r.theme || 'classic-blue');
+};
+
 const PublicPortfolio = () => {
   const { identifier } = useParams<{ identifier: string }>();
   const [data, setData] = useState<PortfolioData | null>(null);
   const [theme, setTheme] = useState<string>('classic-blue');
   const [loading, setLoading] = useState(true);
   const [redirectSlug, setRedirectSlug] = useState<string | null>(null);
+  const [ownerId, setOwnerId] = useState<string | null>(null);
 
   useEffect(() => {
     const load = async () => {
@@ -80,20 +96,29 @@ const PublicPortfolio = () => {
 
       const { data: row } = await supabase.from('portfolios').select('*').eq('slug', identifier).maybeSingle();
       if (row) {
-        const r: any = row;
-        setData({
-          profile: { ...defaultPortfolio.profile, ...((r.profile_data as any) || {}) },
-          artefak: normalizeArtefak(r.artefak_data),
-          reflection: { ...defaultPortfolio.reflection, ...((r.reflection_data as any) || {}) },
-          model_guru: (r.model_guru_data as any) || defaultPortfolio.model_guru,
-          lampiran: (r.lampiran_data as any) || defaultPortfolio.lampiran,
-        });
-        setTheme(r.theme || 'classic-blue');
+        applyRow(row, setData, setTheme);
+        setOwnerId((row as any).user_id);
       }
       setLoading(false);
     };
     load();
   }, [identifier]);
+
+  // Realtime: subscribe ke perubahan baris portfolio milik user ini agar tema/data ter-update tanpa reload
+  useEffect(() => {
+    if (!ownerId) return;
+    const channel = supabase
+      .channel(`public-portfolio-${ownerId}`)
+      .on(
+        'postgres_changes',
+        { event: 'UPDATE', schema: 'public', table: 'portfolios', filter: `user_id=eq.${ownerId}` },
+        (payload) => {
+          if (payload.new) applyRow(payload.new, setData, setTheme);
+        },
+      )
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [ownerId]);
 
   if (redirectSlug) return <Navigate to={`/portfolio/${redirectSlug}`} replace />;
   if (loading) return <div className="min-h-screen flex items-center justify-center text-muted-foreground">Memuat portfolio...</div>;
