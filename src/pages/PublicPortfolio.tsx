@@ -62,6 +62,7 @@ const applyRow = (
   r: any,
   setData: (d: PortfolioData) => void,
   setTheme: (t: string) => void,
+  setOverrides: (o: any) => void,
 ) => {
   setData({
     profile: { ...defaultPortfolio.profile, ...((r.profile_data as any) || {}) },
@@ -71,12 +72,14 @@ const applyRow = (
     lampiran: (r.lampiran_data as any) || defaultPortfolio.lampiran,
   });
   setTheme(r.theme || 'classic-blue');
+  setOverrides((r.theme_overrides as any) || {});
 };
 
 const PublicPortfolio = () => {
   const { identifier } = useParams<{ identifier: string }>();
   const [data, setData] = useState<PortfolioData | null>(null);
   const [theme, setTheme] = useState<string>('classic-blue');
+  const [themeOverrides, setThemeOverrides] = useState<any>({});
   const [loading, setLoading] = useState(true);
   const [redirectSlug, setRedirectSlug] = useState<string | null>(null);
   const [ownerId, setOwnerId] = useState<string | null>(null);
@@ -96,7 +99,7 @@ const PublicPortfolio = () => {
 
       const { data: row } = await supabase.from('portfolios').select('*').eq('slug', identifier).maybeSingle();
       if (row) {
-        applyRow(row, setData, setTheme);
+        applyRow(row, setData, setTheme, setThemeOverrides);
         setOwnerId((row as any).user_id);
       }
       setLoading(false);
@@ -104,7 +107,6 @@ const PublicPortfolio = () => {
     load();
   }, [identifier]);
 
-  // Realtime: subscribe ke perubahan baris portfolio milik user ini agar tema/data ter-update tanpa reload
   useEffect(() => {
     if (!ownerId) return;
     const channel = supabase
@@ -113,7 +115,7 @@ const PublicPortfolio = () => {
         'postgres_changes',
         { event: 'UPDATE', schema: 'public', table: 'portfolios', filter: `user_id=eq.${ownerId}` },
         (payload) => {
-          if (payload.new) applyRow(payload.new, setData, setTheme);
+          if (payload.new) applyRow(payload.new, setData, setTheme, setThemeOverrides);
         },
       )
       .subscribe();
@@ -124,7 +126,7 @@ const PublicPortfolio = () => {
   if (loading) return <div className="min-h-screen flex items-center justify-center text-muted-foreground">Memuat portfolio...</div>;
   if (!data) return <div className="min-h-screen flex items-center justify-center text-muted-foreground">Portfolio tidak ditemukan.</div>;
 
-  return <PortfolioShowcase data={data} themeId={theme} />;
+  return <PortfolioShowcase data={data} themeId={theme} themeOverrides={themeOverrides} />;
 };
 
 export default PublicPortfolio;
