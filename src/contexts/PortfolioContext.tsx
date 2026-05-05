@@ -155,11 +155,19 @@ interface SectionStatus {
   lampiran: boolean;
 }
 
+export interface ThemeOverrides {
+  uppercaseHeadings?: boolean;
+  letterSpacingHeading?: string; // e.g. '0.04em'
+}
+
 interface PortfolioContextType {
   data: PortfolioData;
   slug: string | null;
   theme: string;
+  themeOverrides: ThemeOverrides;
   updateTheme: (themeId: string) => void;
+  updateThemeOverrides: (patch: Partial<ThemeOverrides>) => void;
+  resetThemeOverrides: () => void;
   updateProfile: (profile: Partial<ProfileData>) => void;
   addArtefak: (item: Omit<ArtefakItem, 'id'>) => string;
   updateArtefak: (id: string, patch: Partial<ArtefakItem>) => void;
