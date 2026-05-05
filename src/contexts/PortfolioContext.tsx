@@ -406,7 +406,7 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
   return (
     <PortfolioContext.Provider value={{
-      data, slug, theme, updateTheme,
+      data, slug, theme, themeOverrides, updateTheme, updateThemeOverrides, resetThemeOverrides,
       updateProfile,
       addArtefak, updateArtefak: updateArtefakFn, removeArtefak,
       updateReflection,
