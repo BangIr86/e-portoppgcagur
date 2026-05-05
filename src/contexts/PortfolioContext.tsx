@@ -345,6 +345,33 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     }
   }, [user]);
 
+  const updateThemeOverrides = useCallback(async (patch: Partial<ThemeOverrides>) => {
+    if (!user) return;
+    const next = { ...themeOverrides, ...patch };
+    setThemeOverrides(next);
+    setSaving(true);
+    try {
+      await supabase.from('portfolios').update({ theme_overrides: next as any, updated_at: new Date().toISOString() } as any).eq('user_id', user.id);
+    } catch {
+      toast.error('Gagal menyimpan kustomisasi tema');
+    } finally {
+      setSaving(false);
+    }
+  }, [user, themeOverrides]);
+
+  const resetThemeOverrides = useCallback(async () => {
+    if (!user) return;
+    setThemeOverrides({});
+    setSaving(true);
+    try {
+      await supabase.from('portfolios').update({ theme_overrides: {} as any, updated_at: new Date().toISOString() } as any).eq('user_id', user.id);
+    } catch {
+      toast.error('Gagal mereset kustomisasi tema');
+    } finally {
+      setSaving(false);
+    }
+  }, [user]);
+
   // ============ STATUS RUBRIK ============
   const sectionStatus: SectionStatus = (() => {
     const p = data.profile;
