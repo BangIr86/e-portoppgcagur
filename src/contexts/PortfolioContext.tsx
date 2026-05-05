@@ -193,6 +193,7 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [data, setData] = useState<PortfolioData>(defaultPortfolio);
   const [slug, setSlug] = useState<string | null>(null);
   const [theme, setTheme] = useState<string>('classic-blue');
+  const [themeOverrides, setThemeOverrides] = useState<ThemeOverrides>({});
   const [saving, setSaving] = useState(false);
   const slugRef = useRef<string | null>(null);
   const themeRef = useRef<string>('classic-blue');
