@@ -1,16 +1,28 @@
 import { useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Check, Palette, RotateCcw, Type } from 'lucide-react';
+import { Check, Palette, RotateCcw, Type, Sliders } from 'lucide-react';
 import { usePortfolio } from '@/contexts/PortfolioContext';
-import { PORTFOLIO_THEMES, DEFAULT_THEME_ID, injectThemeFont } from '@/lib/themes';
+import { PORTFOLIO_THEMES, DEFAULT_THEME_ID, injectThemeFont, getTheme, resolveUppercase } from '@/lib/themes';
 import PageTransition from '@/components/PageTransition';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Switch } from '@/components/ui/switch';
+import { Slider } from '@/components/ui/slider';
+import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 
 const TemaPage = () => {
-  const { theme, updateTheme, saving } = usePortfolio();
+  const { theme, themeOverrides, updateTheme, updateThemeOverrides, resetThemeOverrides, saving } = usePortfolio();
   const isDefault = theme === DEFAULT_THEME_ID;
+  const activeTheme = getTheme(theme);
+  const uppercaseOn = resolveUppercase(activeTheme, themeOverrides);
+
+  // Letter spacing dalam em (×100 agar Slider integer). Default ambil dari override → tema → 0.
+  const parseEm = (v?: string) => v ? parseFloat(v.replace('em', '')) : 0;
+  const currentTracking = themeOverrides.letterSpacingHeading !== undefined
+    ? parseEm(themeOverrides.letterSpacingHeading)
+    : parseEm(activeTheme.letterSpacingHeading);
+  const trackingValue = Math.round(currentTracking * 100);
 
   // Preload semua font tema agar setiap kartu menampilkan tipografi aslinya
   useEffect(() => {
