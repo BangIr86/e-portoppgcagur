@@ -1,21 +1,42 @@
 import { motion } from 'framer-motion';
-import { Check, Palette } from 'lucide-react';
+import { Check, Palette, RotateCcw } from 'lucide-react';
 import { usePortfolio } from '@/contexts/PortfolioContext';
-import { PORTFOLIO_THEMES } from '@/lib/themes';
+import { PORTFOLIO_THEMES, DEFAULT_THEME_ID } from '@/lib/themes';
 import PageTransition from '@/components/PageTransition';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
 
 const TemaPage = () => {
   const { theme, updateTheme, saving } = usePortfolio();
+  const isDefault = theme === DEFAULT_THEME_ID;
+
+  const handleReset = async () => {
+    if (isDefault) return;
+    await updateTheme(DEFAULT_THEME_ID);
+    toast.success('Tema dikembalikan ke default (Classic Blue)');
+  };
 
   return (
     <PageTransition>
       <div className="space-y-6">
-        <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-foreground flex items-center gap-2">
-            <Palette className="w-6 h-6 text-primary" /> Tema Portfolio
-          </h1>
-          <p className="text-sm text-muted-foreground">Pilih salah satu dari 10 tema visual untuk halaman portfolio publik Anda.</p>
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+          <div>
+            <h1 className="text-xl sm:text-2xl font-bold text-foreground flex items-center gap-2">
+              <Palette className="w-6 h-6 text-primary" /> Tema Portfolio
+            </h1>
+            <p className="text-sm text-muted-foreground">Pilih salah satu dari 10 tema visual untuk halaman portfolio publik Anda.</p>
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleReset}
+            disabled={isDefault || saving}
+            title={isDefault ? 'Sudah menggunakan tema default' : 'Kembalikan ke Classic Blue'}
+          >
+            <RotateCcw className="w-4 h-4 mr-2" />
+            Kembalikan ke default
+          </Button>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
