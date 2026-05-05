@@ -285,6 +285,7 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         const loadedTheme = r.theme || 'classic-blue';
         themeRef.current = loadedTheme;
         setTheme(loadedTheme);
+        setThemeOverrides((r.theme_overrides as ThemeOverrides) || {});
       }
       return loaded;
     }
