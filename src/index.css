@@ -133,6 +133,26 @@
   }
 }
 
+/* Per-theme typography for portfolio showcase wrapper */
+.portfolio-themed {
+  font-family: var(--font-body, 'Inter', system-ui, sans-serif);
+}
+.portfolio-themed h1,
+.portfolio-themed h2,
+.portfolio-themed h3,
+.portfolio-themed h4,
+.portfolio-themed h5,
+.portfolio-themed h6,
+.portfolio-themed blockquote {
+  font-family: var(--font-heading, 'Inter', system-ui, sans-serif);
+  letter-spacing: var(--heading-tracking, normal);
+}
+.portfolio-themed[data-uppercase-headings="true"] h1,
+.portfolio-themed[data-uppercase-headings="true"] h2,
+.portfolio-themed[data-uppercase-headings="true"] h3 {
+  text-transform: uppercase;
+}
+
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }

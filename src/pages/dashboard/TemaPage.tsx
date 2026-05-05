@@ -1,7 +1,8 @@
+import { useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Check, Palette, RotateCcw } from 'lucide-react';
+import { Check, Palette, RotateCcw, Type } from 'lucide-react';
 import { usePortfolio } from '@/contexts/PortfolioContext';
-import { PORTFOLIO_THEMES, DEFAULT_THEME_ID } from '@/lib/themes';
+import { PORTFOLIO_THEMES, DEFAULT_THEME_ID, injectThemeFont } from '@/lib/themes';
 import PageTransition from '@/components/PageTransition';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -11,11 +12,18 @@ const TemaPage = () => {
   const { theme, updateTheme, saving } = usePortfolio();
   const isDefault = theme === DEFAULT_THEME_ID;
 
+  // Preload semua font tema agar setiap kartu menampilkan tipografi aslinya
+  useEffect(() => {
+    PORTFOLIO_THEMES.forEach(injectThemeFont);
+  }, []);
+
   const handleReset = async () => {
     if (isDefault) return;
     await updateTheme(DEFAULT_THEME_ID);
     toast.success('Tema dikembalikan ke default (Classic Blue)');
   };
+
+  const fontLabel = (font: string) => font.split(',')[0].replace(/['"]/g, '');
 
   return (
     <PageTransition>
@@ -55,7 +63,7 @@ const TemaPage = () => {
                 }`}
               >
                 <div
-                  className="h-28 relative"
+                  className="h-32 relative flex items-center justify-center px-4"
                   style={{ background: `linear-gradient(135deg, ${t.preview.from} 0%, ${t.preview.to} 100%)` }}
                 >
                   {active && (
@@ -63,6 +71,12 @@ const TemaPage = () => {
                       <Check className="w-4 h-4 text-primary" strokeWidth={3} />
                     </div>
                   )}
+                  <span
+                    className="text-white text-2xl font-bold drop-shadow text-center"
+                    style={{ fontFamily: t.headingFont, letterSpacing: t.letterSpacingHeading, textTransform: t.uppercaseHeadings ? 'uppercase' : 'none' }}
+                  >
+                    Aa Bb Cc
+                  </span>
                   <div className="absolute bottom-2 left-2 flex gap-1.5">
                     <span className="w-5 h-5 rounded-full border border-white/60" style={{ background: t.preview.from }} />
                     <span className="w-5 h-5 rounded-full border border-white/60" style={{ background: t.preview.to }} />
@@ -70,10 +84,14 @@ const TemaPage = () => {
                 </div>
                 <div className="p-4 bg-card">
                   <div className="flex items-center gap-2 mb-1">
-                    <p className="font-semibold text-foreground" style={{ fontFamily: t.fontFamily }}>{t.name}</p>
+                    <p className="font-semibold text-foreground" style={{ fontFamily: t.headingFont, letterSpacing: t.letterSpacingHeading, textTransform: t.uppercaseHeadings ? 'uppercase' : 'none' }}>{t.name}</p>
                     {active && <Badge className="text-[10px] h-5">Aktif</Badge>}
                   </div>
-                  <p className="text-xs text-muted-foreground leading-relaxed">{t.description}</p>
+                  <p className="text-xs text-muted-foreground leading-relaxed mb-2" style={{ fontFamily: t.bodyFont }}>{t.description}</p>
+                  <p className="text-[10px] text-muted-foreground/80 flex items-center gap-1">
+                    <Type className="w-3 h-3" />
+                    <span>{fontLabel(t.headingFont)} <span className="opacity-50">+</span> {fontLabel(t.bodyFont)}</span>
+                  </p>
                 </div>
               </motion.button>
             );
