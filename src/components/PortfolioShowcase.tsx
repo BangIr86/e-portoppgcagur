@@ -9,7 +9,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Button } from '@/components/ui/button';
-import { getTheme, themeToStyle, injectThemeFont } from '@/lib/themes';
+import { getTheme, themeToStyle, injectThemeFont, resolveUppercase, type ThemeOverrides } from '@/lib/themes';
 
 const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: 'easeOut' } } };
 const staggerContainer = { hidden: {}, visible: { transition: { staggerChildren: 0.12 } } };
@@ -17,6 +17,7 @@ const staggerContainer = { hidden: {}, visible: { transition: { staggerChildren:
 interface Props {
   data: PortfolioData;
   themeId?: string;
+  themeOverrides?: ThemeOverrides;
 }
 
 const ANALISIS_FIELDS: { key: keyof ArtefakItem; label: string; icon: any }[] = [
@@ -29,7 +30,7 @@ const ANALISIS_FIELDS: { key: keyof ArtefakItem; label: string; icon: any }[] = 
   { key: 'adaptasi_pembelajaran', label: 'Adaptasi Pembelajaran', icon: RefreshCw },
 ];
 
-const PortfolioShowcase = ({ data, themeId }: Props) => {
+const PortfolioShowcase = ({ data, themeId, themeOverrides }: Props) => {
   const p = data.profile;
   const a = data.artefak;
   const r = data.reflection;
@@ -37,6 +38,7 @@ const PortfolioShowcase = ({ data, themeId }: Props) => {
 
   const theme = getTheme(themeId);
   useEffect(() => { injectThemeFont(theme); }, [theme]);
+  const uppercase = resolveUppercase(theme, themeOverrides);
 
   // Group artefak by kategori
   const artefakByKategori = a.reduce((acc, item) => {
@@ -50,7 +52,7 @@ const PortfolioShowcase = ({ data, themeId }: Props) => {
   const lampiranOther = data.lampiran.filter(l => !['lampiran7', 'lampiran8'].includes(l.tipe));
 
   return (
-    <div style={themeToStyle(theme)} data-uppercase-headings={theme.uppercaseHeadings ? 'true' : 'false'} className="portfolio-themed min-h-screen bg-background text-foreground w-full max-w-full overflow-hidden">
+    <div style={themeToStyle(theme, themeOverrides)} data-uppercase-headings={uppercase ? 'true' : 'false'} className="portfolio-themed min-h-screen bg-background text-foreground w-full max-w-full overflow-hidden">
       {/* HERO BERANDA */}
       <section id="beranda" className="showcase-hero text-primary-foreground py-12 sm:py-24 px-4 sm:px-6">
         <div className="max-w-4xl mx-auto text-center">

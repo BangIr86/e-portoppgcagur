@@ -179,8 +179,13 @@ export const DEFAULT_THEME_ID = 'classic-blue';
 export const getTheme = (id?: string | null): PortfolioTheme =>
   PORTFOLIO_THEMES.find(t => t.id === id) || PORTFOLIO_THEMES[0];
 
+export interface ThemeOverrides {
+  uppercaseHeadings?: boolean;
+  letterSpacingHeading?: string;
+}
+
 // Convert theme.vars + fonts to inline style for the wrapper
-export const themeToStyle = (theme: PortfolioTheme): React.CSSProperties => {
+export const themeToStyle = (theme: PortfolioTheme, overrides?: ThemeOverrides): React.CSSProperties => {
   const style: Record<string, string> = {
     ...theme.vars,
     '--font-heading': theme.headingFont,
@@ -188,9 +193,13 @@ export const themeToStyle = (theme: PortfolioTheme): React.CSSProperties => {
     fontFamily: theme.bodyFont,
   };
   if (theme.radius) style['--radius'] = theme.radius;
-  if (theme.letterSpacingHeading) style['--heading-tracking'] = theme.letterSpacingHeading;
+  const tracking = overrides?.letterSpacingHeading ?? theme.letterSpacingHeading;
+  if (tracking) style['--heading-tracking'] = tracking;
   return style as React.CSSProperties;
 };
+
+export const resolveUppercase = (theme: PortfolioTheme, overrides?: ThemeOverrides): boolean =>
+  overrides?.uppercaseHeadings !== undefined ? !!overrides.uppercaseHeadings : !!theme.uppercaseHeadings;
 
 // Idempotent Google Fonts injection for ALL fonts the theme needs
 const injected = new Set<string>();

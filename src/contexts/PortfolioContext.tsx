@@ -155,11 +155,19 @@ interface SectionStatus {
   lampiran: boolean;
 }
 
+export interface ThemeOverrides {
+  uppercaseHeadings?: boolean;
+  letterSpacingHeading?: string; // e.g. '0.04em'
+}
+
 interface PortfolioContextType {
   data: PortfolioData;
   slug: string | null;
   theme: string;
+  themeOverrides: ThemeOverrides;
   updateTheme: (themeId: string) => void;
+  updateThemeOverrides: (patch: Partial<ThemeOverrides>) => void;
+  resetThemeOverrides: () => void;
   updateProfile: (profile: Partial<ProfileData>) => void;
   addArtefak: (item: Omit<ArtefakItem, 'id'>) => string;
   updateArtefak: (id: string, patch: Partial<ArtefakItem>) => void;
@@ -185,6 +193,7 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [data, setData] = useState<PortfolioData>(defaultPortfolio);
   const [slug, setSlug] = useState<string | null>(null);
   const [theme, setTheme] = useState<string>('classic-blue');
+  const [themeOverrides, setThemeOverrides] = useState<ThemeOverrides>({});
   const [saving, setSaving] = useState(false);
   const slugRef = useRef<string | null>(null);
   const themeRef = useRef<string>('classic-blue');
@@ -276,6 +285,7 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         const loadedTheme = r.theme || 'classic-blue';
         themeRef.current = loadedTheme;
         setTheme(loadedTheme);
+        setThemeOverrides((r.theme_overrides as ThemeOverrides) || {});
       }
       return loaded;
     }
@@ -335,6 +345,33 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     }
   }, [user]);
 
+  const updateThemeOverrides = useCallback(async (patch: Partial<ThemeOverrides>) => {
+    if (!user) return;
+    const next = { ...themeOverrides, ...patch };
+    setThemeOverrides(next);
+    setSaving(true);
+    try {
+      await supabase.from('portfolios').update({ theme_overrides: next as any, updated_at: new Date().toISOString() } as any).eq('user_id', user.id);
+    } catch {
+      toast.error('Gagal menyimpan kustomisasi tema');
+    } finally {
+      setSaving(false);
+    }
+  }, [user, themeOverrides]);
+
+  const resetThemeOverrides = useCallback(async () => {
+    if (!user) return;
+    setThemeOverrides({});
+    setSaving(true);
+    try {
+      await supabase.from('portfolios').update({ theme_overrides: {} as any, updated_at: new Date().toISOString() } as any).eq('user_id', user.id);
+    } catch {
+      toast.error('Gagal mereset kustomisasi tema');
+    } finally {
+      setSaving(false);
+    }
+  }, [user]);
+
   // ============ STATUS RUBRIK ============
   const sectionStatus: SectionStatus = (() => {
     const p = data.profile;
@@ -369,7 +406,7 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
   return (
     <PortfolioContext.Provider value={{
-      data, slug, theme, updateTheme,
+      data, slug, theme, themeOverrides, updateTheme, updateThemeOverrides, resetThemeOverrides,
       updateProfile,
       addArtefak, updateArtefak: updateArtefakFn, removeArtefak,
       updateReflection,

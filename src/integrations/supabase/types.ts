@@ -25,6 +25,7 @@ export type Database = {
           reflection_data: Json | null
           slug: string | null
           theme: string
+          theme_overrides: Json
           updated_at: string
           user_id: string
         }
@@ -38,6 +39,7 @@ export type Database = {
           reflection_data?: Json | null
           slug?: string | null
           theme?: string
+          theme_overrides?: Json
           updated_at?: string
           user_id: string
         }
@@ -51,6 +53,7 @@ export type Database = {
           reflection_data?: Json | null
           slug?: string | null
           theme?: string
+          theme_overrides?: Json
           updated_at?: string
           user_id?: string
         }
