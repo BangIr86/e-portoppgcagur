@@ -50,7 +50,7 @@ const PortfolioShowcase = ({ data, themeId }: Props) => {
   const lampiranOther = data.lampiran.filter(l => !['lampiran7', 'lampiran8'].includes(l.tipe));
 
   return (
-    <div style={themeToStyle(theme)} className="portfolio-themed min-h-screen bg-background text-foreground w-full max-w-full overflow-hidden">
+    <div style={themeToStyle(theme)} data-uppercase-headings={theme.uppercaseHeadings ? 'true' : 'false'} className="portfolio-themed min-h-screen bg-background text-foreground w-full max-w-full overflow-hidden">
       {/* HERO BERANDA */}
       <section id="beranda" className="showcase-hero text-primary-foreground py-12 sm:py-24 px-4 sm:px-6">
         <div className="max-w-4xl mx-auto text-center">
