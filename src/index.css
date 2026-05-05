@@ -147,6 +147,11 @@
   font-family: var(--font-heading, 'Inter', system-ui, sans-serif);
   letter-spacing: var(--heading-tracking, normal);
 }
+.portfolio-themed[data-uppercase-headings="true"] h1,
+.portfolio-themed[data-uppercase-headings="true"] h2,
+.portfolio-themed[data-uppercase-headings="true"] h3 {
+  text-transform: uppercase;
+}
 
 @keyframes fadeIn {
   from { opacity: 0; }
