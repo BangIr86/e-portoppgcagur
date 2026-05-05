@@ -1,7 +1,8 @@
+import { useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Check, Palette, RotateCcw } from 'lucide-react';
+import { Check, Palette, RotateCcw, Type } from 'lucide-react';
 import { usePortfolio } from '@/contexts/PortfolioContext';
-import { PORTFOLIO_THEMES, DEFAULT_THEME_ID } from '@/lib/themes';
+import { PORTFOLIO_THEMES, DEFAULT_THEME_ID, injectThemeFont } from '@/lib/themes';
 import PageTransition from '@/components/PageTransition';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -11,11 +12,18 @@ const TemaPage = () => {
   const { theme, updateTheme, saving } = usePortfolio();
   const isDefault = theme === DEFAULT_THEME_ID;
 
+  // Preload semua font tema agar setiap kartu menampilkan tipografi aslinya
+  useEffect(() => {
+    PORTFOLIO_THEMES.forEach(injectThemeFont);
+  }, []);
+
   const handleReset = async () => {
     if (isDefault) return;
     await updateTheme(DEFAULT_THEME_ID);
     toast.success('Tema dikembalikan ke default (Classic Blue)');
   };
+
+  const fontLabel = (font: string) => font.split(',')[0].replace(/['"]/g, '');
 
   return (
     <PageTransition>
