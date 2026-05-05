@@ -70,7 +70,7 @@ const TemaPage = () => {
                 </div>
                 <div className="p-4 bg-card">
                   <div className="flex items-center gap-2 mb-1">
-                    <p className="font-semibold text-foreground" style={{ fontFamily: t.fontFamily }}>{t.name}</p>
+                    <p className="font-semibold text-foreground" style={{ fontFamily: t.headingFont }}>{t.name}</p>
                     {active && <Badge className="text-[10px] h-5">Aktif</Badge>}
                   </div>
                   <p className="text-xs text-muted-foreground leading-relaxed">{t.description}</p>
