@@ -39,7 +39,7 @@ const PreviewPage = () => {
         </div>
         <div className="border rounded-lg overflow-hidden bg-card -mx-2 sm:mx-0">
           <div className="overflow-x-hidden">
-            <PortfolioShowcase data={data} themeId={theme} />
+            <PortfolioShowcase data={data} themeId={theme} themeOverrides={themeOverrides} />
           </div>
         </div>
       </div>
