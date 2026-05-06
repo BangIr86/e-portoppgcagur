@@ -1,8 +1,8 @@
 import { useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Check, Palette, RotateCcw, Type, Sliders } from 'lucide-react';
+import { Check, Palette, RotateCcw, Type, Sliders, MapPin, Target, BookOpen, Sparkles, Quote, GraduationCap } from 'lucide-react';
 import { usePortfolio } from '@/contexts/PortfolioContext';
-import { PORTFOLIO_THEMES, DEFAULT_THEME_ID, injectThemeFont, getTheme, resolveUppercase } from '@/lib/themes';
+import { PORTFOLIO_THEMES, DEFAULT_THEME_ID, injectThemeFont, getTheme, resolveUppercase, themeToStyle } from '@/lib/themes';
 import PageTransition from '@/components/PageTransition';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
