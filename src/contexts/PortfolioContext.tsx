@@ -160,11 +160,30 @@ export interface ThemeOverrides {
   letterSpacingHeading?: string; // e.g. '0.04em'
 }
 
+// Map per-theme overrides: { [themeId]: ThemeOverrides }
+export type ThemeOverridesMap = Record<string, ThemeOverrides>;
+
+// Normalisasi: data lama bisa berbentuk flat (ThemeOverrides) untuk satu tema saja.
+// Konversi ke map yang dimiliki tema aktif.
+const normalizeOverridesMap = (raw: any, activeThemeId: string): ThemeOverridesMap => {
+  if (!raw || typeof raw !== 'object') return {};
+  const keys = Object.keys(raw);
+  const looksLikeFlat = keys.some(k => k === 'uppercaseHeadings' || k === 'letterSpacingHeading');
+  if (looksLikeFlat) {
+    const flat: ThemeOverrides = {};
+    if (typeof raw.uppercaseHeadings === 'boolean') flat.uppercaseHeadings = raw.uppercaseHeadings;
+    if (typeof raw.letterSpacingHeading === 'string') flat.letterSpacingHeading = raw.letterSpacingHeading;
+    return Object.keys(flat).length ? { [activeThemeId]: flat } : {};
+  }
+  return raw as ThemeOverridesMap;
+};
+
 interface PortfolioContextType {
   data: PortfolioData;
   slug: string | null;
   theme: string;
   themeOverrides: ThemeOverrides;
+  themeOverridesMap: ThemeOverridesMap;
   updateTheme: (themeId: string) => void;
   updateThemeOverrides: (patch: Partial<ThemeOverrides>) => void;
   resetThemeOverrides: () => void;
@@ -193,7 +212,7 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [data, setData] = useState<PortfolioData>(defaultPortfolio);
   const [slug, setSlug] = useState<string | null>(null);
   const [theme, setTheme] = useState<string>('classic-blue');
-  const [themeOverrides, setThemeOverrides] = useState<ThemeOverrides>({});
+  const [themeOverridesMap, setThemeOverridesMap] = useState<ThemeOverridesMap>({});
   const [saving, setSaving] = useState(false);
   const slugRef = useRef<string | null>(null);
   const themeRef = useRef<string>('classic-blue');
@@ -285,7 +304,7 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         const loadedTheme = r.theme || 'classic-blue';
         themeRef.current = loadedTheme;
         setTheme(loadedTheme);
-        setThemeOverrides((r.theme_overrides as ThemeOverrides) || {});
+        setThemeOverridesMap(normalizeOverridesMap(r.theme_overrides, loadedTheme));
       }
       return loaded;
     }
@@ -345,32 +364,43 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     }
   }, [user]);
 
+  const themeOverrides: ThemeOverrides = themeOverridesMap[theme] || {};
+
   const updateThemeOverrides = useCallback(async (patch: Partial<ThemeOverrides>) => {
     if (!user) return;
-    const next = { ...themeOverrides, ...patch };
-    setThemeOverrides(next);
+    const activeTheme = themeRef.current;
+    const currentForTheme = themeOverridesMap[activeTheme] || {};
+    const merged: ThemeOverrides = { ...currentForTheme, ...patch };
+    // Cleanup: hapus key yang undefined agar tidak menyimpan noise
+    if (merged.uppercaseHeadings === undefined) delete merged.uppercaseHeadings;
+    if (merged.letterSpacingHeading === undefined) delete merged.letterSpacingHeading;
+    const nextMap: ThemeOverridesMap = { ...themeOverridesMap, [activeTheme]: merged };
+    setThemeOverridesMap(nextMap);
     setSaving(true);
     try {
-      await supabase.from('portfolios').update({ theme_overrides: next as any, updated_at: new Date().toISOString() } as any).eq('user_id', user.id);
+      await supabase.from('portfolios').update({ theme_overrides: nextMap as any, updated_at: new Date().toISOString() } as any).eq('user_id', user.id);
     } catch {
       toast.error('Gagal menyimpan kustomisasi tema');
     } finally {
       setSaving(false);
     }
-  }, [user, themeOverrides]);
+  }, [user, themeOverridesMap]);
 
   const resetThemeOverrides = useCallback(async () => {
     if (!user) return;
-    setThemeOverrides({});
+    const activeTheme = themeRef.current;
+    const nextMap: ThemeOverridesMap = { ...themeOverridesMap };
+    delete nextMap[activeTheme];
+    setThemeOverridesMap(nextMap);
     setSaving(true);
     try {
-      await supabase.from('portfolios').update({ theme_overrides: {} as any, updated_at: new Date().toISOString() } as any).eq('user_id', user.id);
+      await supabase.from('portfolios').update({ theme_overrides: nextMap as any, updated_at: new Date().toISOString() } as any).eq('user_id', user.id);
     } catch {
       toast.error('Gagal mereset kustomisasi tema');
     } finally {
       setSaving(false);
     }
-  }, [user]);
+  }, [user, themeOverridesMap]);
 
   // ============ STATUS RUBRIK ============
   const sectionStatus: SectionStatus = (() => {
@@ -406,7 +436,7 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
   return (
     <PortfolioContext.Provider value={{
-      data, slug, theme, themeOverrides, updateTheme, updateThemeOverrides, resetThemeOverrides,
+      data, slug, theme, themeOverrides, themeOverridesMap, updateTheme, updateThemeOverrides, resetThemeOverrides,
       updateProfile,
       addArtefak, updateArtefak: updateArtefakFn, removeArtefak,
       updateReflection,
