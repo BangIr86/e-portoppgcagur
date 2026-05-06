@@ -160,6 +160,24 @@ export interface ThemeOverrides {
   letterSpacingHeading?: string; // e.g. '0.04em'
 }
 
+// Map per-theme overrides: { [themeId]: ThemeOverrides }
+export type ThemeOverridesMap = Record<string, ThemeOverrides>;
+
+// Normalisasi: data lama bisa berbentuk flat (ThemeOverrides) untuk satu tema saja.
+// Konversi ke map yang dimiliki tema aktif.
+const normalizeOverridesMap = (raw: any, activeThemeId: string): ThemeOverridesMap => {
+  if (!raw || typeof raw !== 'object') return {};
+  const keys = Object.keys(raw);
+  const looksLikeFlat = keys.some(k => k === 'uppercaseHeadings' || k === 'letterSpacingHeading');
+  if (looksLikeFlat) {
+    const flat: ThemeOverrides = {};
+    if (typeof raw.uppercaseHeadings === 'boolean') flat.uppercaseHeadings = raw.uppercaseHeadings;
+    if (typeof raw.letterSpacingHeading === 'string') flat.letterSpacingHeading = raw.letterSpacingHeading;
+    return Object.keys(flat).length ? { [activeThemeId]: flat } : {};
+  }
+  return raw as ThemeOverridesMap;
+};
+
 interface PortfolioContextType {
   data: PortfolioData;
   slug: string | null;
