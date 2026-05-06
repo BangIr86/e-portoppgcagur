@@ -1,8 +1,8 @@
 import { useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Check, Palette, RotateCcw, Type, Sliders } from 'lucide-react';
+import { Check, Palette, RotateCcw, Type, Sliders, MapPin, Target, BookOpen, Sparkles, Quote, GraduationCap } from 'lucide-react';
 import { usePortfolio } from '@/contexts/PortfolioContext';
-import { PORTFOLIO_THEMES, DEFAULT_THEME_ID, injectThemeFont, getTheme, resolveUppercase } from '@/lib/themes';
+import { PORTFOLIO_THEMES, DEFAULT_THEME_ID, injectThemeFont, getTheme, resolveUppercase, themeToStyle } from '@/lib/themes';
 import PageTransition from '@/components/PageTransition';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -160,7 +160,7 @@ const TemaPage = () => {
             <p className="text-xs text-muted-foreground">Geser ke kiri untuk lebih rapat, ke kanan untuk lebih renggang.</p>
           </div>
 
-          {/* Preview live */}
+          {/* Preview live tipografi */}
           <div
             className="p-5 rounded-lg border bg-background"
             style={{
@@ -173,6 +173,98 @@ const TemaPage = () => {
             <p className="text-sm text-muted-foreground mt-1" style={{ textTransform: 'none', letterSpacing: 'normal', fontFamily: activeTheme.bodyFont }}>
               Body text contoh menggunakan font {fontLabel(activeTheme.bodyFont)}.
             </p>
+          </div>
+        </div>
+
+        {/* Preview Konten Lengkap (Hero, Profil, Kartu Analisis) */}
+        <div className="rounded-xl border bg-card overflow-hidden">
+          <div className="px-5 sm:px-6 py-4 border-b flex items-center justify-between flex-wrap gap-2">
+            <div>
+              <h2 className="font-semibold text-foreground flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-primary" /> Preview Konten Lengkap
+              </h2>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                Contoh tampilan hero, profil, dan kartu analisis dengan font tema <strong>{activeTheme.name}</strong>.
+              </p>
+            </div>
+            <Badge variant="outline" className="text-[10px]">{fontLabel(activeTheme.headingFont)} + {fontLabel(activeTheme.bodyFont)}</Badge>
+          </div>
+
+          <div
+            style={themeToStyle(activeTheme, themeOverrides)}
+            data-uppercase-headings={uppercaseOn ? 'true' : 'false'}
+            className="portfolio-themed bg-background text-foreground"
+          >
+            {/* HERO */}
+            <div
+              className="relative px-6 sm:px-10 py-10 sm:py-14 text-center text-primary-foreground overflow-hidden"
+              style={{ background: 'var(--showcase-hero-bg)' }}
+            >
+              <div className="w-20 h-20 rounded-full bg-white/20 mx-auto mb-4 flex items-center justify-center backdrop-blur">
+                <GraduationCap className="w-10 h-10" />
+              </div>
+              <h1 className="text-3xl sm:text-4xl font-bold mb-2">Sari Indah Pertiwi</h1>
+              <p className="text-sm sm:text-base opacity-90 mb-4">Mahasiswa PPG Prajabatan • Pendidikan Bahasa Indonesia</p>
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/15 text-sm backdrop-blur">
+                <Quote className="w-4 h-4" />
+                <span style={{ textTransform: 'none', letterSpacing: 'normal', fontFamily: 'var(--font-body)' }}>
+                  "Mengajar adalah seni menumbuhkan harapan."
+                </span>
+              </div>
+            </div>
+
+            {/* PROFIL */}
+            <div className="px-6 sm:px-10 py-8 border-b">
+              <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-3">Tentang Saya</h2>
+              <p className="text-sm text-muted-foreground leading-relaxed" style={{ fontFamily: 'var(--font-body)' }}>
+                Saya adalah calon pendidik dari Yogyakarta yang berkomitmen membangun pembelajaran
+                bermakna melalui pendekatan diferensiasi. Latar budaya Jawa membentuk cara saya
+                memandang relasi guru–murid sebagai ruang dialog yang setara.
+              </p>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-4">
+                {[
+                  { l: 'Asal Daerah', v: 'Yogyakarta' },
+                  { l: 'Kampus', v: 'UNY' },
+                  { l: 'Bidang Studi', v: 'Bahasa Indonesia' },
+                ].map((s) => (
+                  <div key={s.l} className="p-3 rounded-lg bg-muted/40">
+                    <p className="text-[10px] uppercase tracking-wider text-muted-foreground" style={{ fontFamily: 'var(--font-body)' }}>{s.l}</p>
+                    <p className="font-semibold text-foreground text-sm mt-0.5">{s.v}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* KARTU ANALISIS */}
+            <div className="px-6 sm:px-10 py-8">
+              <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-4">Analisis Artefak Pembelajaran</h2>
+              <div className="rounded-xl border bg-card p-5 shadow-sm">
+                <div className="flex items-start justify-between gap-3 mb-3 flex-wrap">
+                  <div>
+                    <h3 className="text-lg font-semibold text-foreground">Modul Ajar Teks Eksplanasi</h3>
+                    <p className="text-xs text-muted-foreground mt-0.5" style={{ fontFamily: 'var(--font-body)' }}>
+                      Kelas VIII • SMP Negeri 5 Yogyakarta
+                    </p>
+                  </div>
+                  <Badge className="text-[10px]">Modul Ajar</Badge>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  {[
+                    { icon: MapPin, l: 'Konteks', v: 'Pembelajaran daring pasca-pandemi.' },
+                    { icon: Target, l: 'Tujuan', v: 'Siswa mampu menulis teks eksplanasi runtut.' },
+                    { icon: BookOpen, l: 'Teori Pedagogi', v: 'Konstruktivisme Vygotsky.' },
+                  ].map((it) => (
+                    <div key={it.l} className="p-3 rounded-lg bg-muted/40">
+                      <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-muted-foreground mb-1" style={{ fontFamily: 'var(--font-body)' }}>
+                        <it.icon className="w-3 h-3" />
+                        <span>{it.l}</span>
+                      </div>
+                      <p className="text-sm text-foreground" style={{ fontFamily: 'var(--font-body)' }}>{it.v}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
