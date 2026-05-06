@@ -183,6 +183,7 @@ interface PortfolioContextType {
   slug: string | null;
   theme: string;
   themeOverrides: ThemeOverrides;
+  themeOverridesMap: ThemeOverridesMap;
   updateTheme: (themeId: string) => void;
   updateThemeOverrides: (patch: Partial<ThemeOverrides>) => void;
   resetThemeOverrides: () => void;
@@ -211,7 +212,7 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [data, setData] = useState<PortfolioData>(defaultPortfolio);
   const [slug, setSlug] = useState<string | null>(null);
   const [theme, setTheme] = useState<string>('classic-blue');
-  const [themeOverrides, setThemeOverrides] = useState<ThemeOverrides>({});
+  const [themeOverridesMap, setThemeOverridesMap] = useState<ThemeOverridesMap>({});
   const [saving, setSaving] = useState(false);
   const slugRef = useRef<string | null>(null);
   const themeRef = useRef<string>('classic-blue');
