@@ -72,7 +72,12 @@ const applyRow = (
     lampiran: (r.lampiran_data as any) || defaultPortfolio.lampiran,
   });
   setTheme(r.theme || 'classic-blue');
-  setOverrides((r.theme_overrides as any) || {});
+  const rawOv = (r.theme_overrides as any) || {};
+  const activeId = r.theme || 'classic-blue';
+  // Support legacy flat overrides + new per-theme map
+  const isFlat = rawOv && typeof rawOv === 'object' && ('uppercaseHeadings' in rawOv || 'letterSpacingHeading' in rawOv);
+  const forActive = isFlat ? rawOv : (rawOv[activeId] || {});
+  setOverrides(forActive);
 };
 
 const PublicPortfolio = () => {
