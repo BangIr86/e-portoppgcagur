@@ -1,14 +1,14 @@
 import PageTransition from '@/components/PageTransition';
 import LampiranForm from './LampiranForm';
-import { usePortfolio, ArtefakItem, ArtefakKategori, KATEGORI_LABEL } from '@/contexts/PortfolioContext';
+import { usePortfolio, ArtefakItem, ArtefakKategori, ArtefakFile, KATEGORI_LABEL } from '@/contexts/PortfolioContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Badge } from '@/components/ui/badge';
@@ -36,43 +36,83 @@ const KATEGORI_OPTIONS: ArtefakKategori[] = [
 ];
 
 const ANALISIS_FIELDS: { key: keyof ArtefakItem; label: string; placeholder: string }[] = [
-  { key: 'konteks', label: 'Konteks', placeholder: 'Latar belakang situasi pembelajaran (kelas, mata pelajaran, kondisi siswa, tantangan kontekstual)...' },
-  { key: 'tujuan', label: 'Tujuan', placeholder: 'Tujuan pembelajaran atau capaian yang ingin dicapai melalui artefak ini...' },
-  { key: 'kelebihan', label: 'Kelebihan', placeholder: 'Kekuatan dan hal positif dari artefak ini (inovasi, kesesuaian, efektivitas)...' },
-  { key: 'kekurangan', label: 'Kekurangan', placeholder: 'Keterbatasan, hal yang masih perlu diperbaiki, atau hambatan saat implementasi...' },
-  { key: 'teori_pedagogi', label: 'Teori Pedagogi', placeholder: 'Landasan teori pedagogi yang mendasari (mis. konstruktivisme, TPACK, UbD, dll.)...' },
-  { key: 'faktor_keberhasilan', label: 'Faktor Keberhasilan', placeholder: 'Faktor-faktor yang mendukung tercapainya tujuan pembelajaran...' },
-  { key: 'adaptasi_pembelajaran', label: 'Adaptasi Pembelajaran', placeholder: 'Penyesuaian yang akan dilakukan ke depan berdasarkan refleksi artefak ini...' },
+  { key: 'konteks', label: 'Konteks', placeholder: 'Latar belakang situasi pembelajaran...' },
+  { key: 'tujuan', label: 'Tujuan', placeholder: 'Tujuan pembelajaran yang ingin dicapai...' },
+  { key: 'kelebihan', label: 'Kelebihan', placeholder: 'Kekuatan dan hal positif dari artefak ini...' },
+  { key: 'kekurangan', label: 'Kekurangan', placeholder: 'Keterbatasan atau hambatan...' },
+  { key: 'teori_pedagogi', label: 'Teori Pedagogi', placeholder: 'Landasan teori pedagogi...' },
+  { key: 'faktor_keberhasilan', label: 'Faktor Keberhasilan', placeholder: 'Faktor pendukung keberhasilan...' },
+  { key: 'adaptasi_pembelajaran', label: 'Adaptasi Pembelajaran', placeholder: 'Penyesuaian ke depan...' },
 ];
 
 const isComplete = (a: ArtefakItem) =>
-  Boolean(a.judul && a.deskripsi && ANALISIS_FIELDS.every(f => (a as any)[f.key]));
+  Boolean(a.judul && a.deskripsi && a.kategoris.length > 0 && ANALISIS_FIELDS.every(f => (a as any)[f.key]));
 
 const ArtefakCard = ({ item }: { item: ArtefakItem }) => {
   const { updateArtefak, removeArtefak } = usePortfolio();
   const { user } = useAuth();
   const fileRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
-  const [youtubeUrl, setYoutubeUrl] = useState(item.youtube_url || '');
+  const [youtubeUrl, setYoutubeUrl] = useState('');
   const complete = isComplete(item);
+
+  const syncPrimary = (files: ArtefakFile[]) => {
+    const primary = files[0];
+    return {
+      files,
+      file_url: primary?.file_url || '',
+      file_type: primary?.file_type || '',
+      youtube_url: primary?.youtube_url,
+    };
+  };
 
   const handleUpload = async (file: File) => {
     if (!user) return;
     setUploading(true);
+    const fileId = crypto.randomUUID();
     const ext = file.name.split('.').pop();
-    const path = `${user.id}/artefak/${item.id}.${ext}`;
+    const path = `${user.id}/artefak/${item.id}-${fileId}.${ext}`;
     const { error } = await supabase.storage.from('portfolio-files').upload(path, file, { upsert: true });
     if (error) { toast.error('Gagal upload file'); setUploading(false); return; }
     const { data: urlData } = supabase.storage.from('portfolio-files').getPublicUrl(path);
-    updateArtefak(item.id, { file_url: urlData.publicUrl, file_type: getFileType(file) });
+    const newFile: ArtefakFile = {
+      id: fileId,
+      file_url: urlData.publicUrl,
+      file_type: getFileType(file),
+      label: file.name,
+    };
+    const nextFiles = [...item.files, newFile];
+    updateArtefak(item.id, syncPrimary(nextFiles));
     toast.success('File berhasil diupload');
     setUploading(false);
   };
 
-  const handleSetYoutube = () => {
+  const handleAddYoutube = () => {
     if (!getYoutubeId(youtubeUrl)) { toast.error('URL YouTube tidak valid'); return; }
-    updateArtefak(item.id, { file_url: youtubeUrl, file_type: 'youtube', youtube_url: youtubeUrl });
-    toast.success('Link YouTube tersimpan');
+    const newFile: ArtefakFile = {
+      id: crypto.randomUUID(),
+      file_url: youtubeUrl,
+      file_type: 'youtube',
+      youtube_url: youtubeUrl,
+      label: 'Video YouTube',
+    };
+    const nextFiles = [...item.files, newFile];
+    updateArtefak(item.id, syncPrimary(nextFiles));
+    setYoutubeUrl('');
+    toast.success('Link YouTube ditambahkan');
+  };
+
+  const removeFile = (id: string) => {
+    const nextFiles = item.files.filter(f => f.id !== id);
+    updateArtefak(item.id, syncPrimary(nextFiles));
+  };
+
+  const toggleKategori = (k: ArtefakKategori, checked: boolean) => {
+    const next = checked
+      ? Array.from(new Set([...item.kategoris, k]))
+      : item.kategoris.filter(x => x !== k);
+    if (next.length === 0) { toast.error('Minimal pilih satu kategori'); return; }
+    updateArtefak(item.id, { kategoris: next, kategori: next[0] });
   };
 
   return (
@@ -84,9 +124,16 @@ const ArtefakCard = ({ item }: { item: ArtefakItem }) => {
             : <AlertCircle className="w-5 h-5 text-muted-foreground shrink-0" />}
           <div className="flex-1 min-w-0 text-left">
             <p className="font-medium text-foreground truncate">{item.judul || 'Artefak tanpa judul'}</p>
-            <p className="text-xs text-muted-foreground">{KATEGORI_LABEL[item.kategori]}</p>
+            <div className="flex flex-wrap gap-1 mt-1">
+              {item.kategoris.map(k => (
+                <Badge key={k} variant="secondary" className="text-[10px] font-normal">{KATEGORI_LABEL[k]}</Badge>
+              ))}
+              {item.files.length > 0 && (
+                <Badge variant="outline" className="text-[10px] font-normal">{item.files.length} file</Badge>
+              )}
+            </div>
           </div>
-          {!complete && <Badge variant="outline" className="text-xs">Belum lengkap</Badge>}
+          {!complete && <Badge variant="outline" className="text-xs shrink-0">Belum lengkap</Badge>}
         </div>
       </AccordionTrigger>
       <AccordionContent className="px-4 pb-4">
@@ -97,52 +144,62 @@ const ArtefakCard = ({ item }: { item: ArtefakItem }) => {
           </TabsList>
 
           <TabsContent value="detail" className="space-y-4 pt-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>Judul Artefak</Label>
-                <Input value={item.judul} onChange={e => updateArtefak(item.id, { judul: e.target.value })} placeholder="Mis. Modul Ajar Algoritma Pertemuan 1" />
-              </div>
-              <div className="space-y-2">
-                <Label>Kategori</Label>
-                <Select value={item.kategori} onValueChange={(v: ArtefakKategori) => updateArtefak(item.id, { kategori: v })}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    {KATEGORI_OPTIONS.map(k => <SelectItem key={k} value={k}>{KATEGORI_LABEL[k]}</SelectItem>)}
-                  </SelectContent>
-                </Select>
+            <div className="space-y-2">
+              <Label>Judul Artefak</Label>
+              <Input value={item.judul} onChange={e => updateArtefak(item.id, { judul: e.target.value })} placeholder="Mis. Modul Ajar Algoritma Pertemuan 1" />
+            </div>
+
+            <div className="space-y-2">
+              <Label>Kategori (boleh lebih dari satu)</Label>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 p-3 rounded-md border bg-muted/30">
+                {KATEGORI_OPTIONS.map(k => {
+                  const checked = item.kategoris.includes(k);
+                  return (
+                    <label key={k} className="flex items-center gap-2 text-sm cursor-pointer">
+                      <Checkbox checked={checked} onCheckedChange={(v) => toggleKategori(k, Boolean(v))} />
+                      <span>{KATEGORI_LABEL[k]}</span>
+                    </label>
+                  );
+                })}
               </div>
             </div>
+
             <div className="space-y-2">
               <Label>Deskripsi Singkat</Label>
               <Textarea value={item.deskripsi} onChange={e => updateArtefak(item.id, { deskripsi: e.target.value })} placeholder="Deskripsi singkat tentang artefak ini..." rows={3} />
             </div>
 
             <div className="space-y-2">
-              <Label>File / Media</Label>
-              {item.file_url && (
-                <div className="flex items-center gap-2 p-2 rounded bg-muted/50 text-sm">
-                  {item.file_type === 'image' && <ImageIcon className="w-4 h-4 text-primary" />}
-                  {item.file_type === 'youtube' && <Youtube className="w-4 h-4 text-red-500" />}
-                  {!['image', 'youtube'].includes(item.file_type) && <FileText className="w-4 h-4 text-primary" />}
-                  <a href={item.file_url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline truncate flex-1">
-                    {item.file_type === 'youtube' ? 'Video YouTube' : 'File terupload'}
-                  </a>
-                  <Button variant="ghost" size="sm" onClick={() => updateArtefak(item.id, { file_url: '', file_type: '', youtube_url: undefined })}>
-                    <Trash2 className="w-3 h-3" />
-                  </Button>
+              <Label>File / Media (boleh lebih dari satu)</Label>
+              {item.files.length > 0 && (
+                <div className="space-y-2">
+                  {item.files.map((f, idx) => (
+                    <div key={f.id} className="flex items-center gap-2 p-2 rounded bg-muted/50 text-sm">
+                      {f.file_type === 'image' && <ImageIcon className="w-4 h-4 text-primary shrink-0" />}
+                      {f.file_type === 'youtube' && <Youtube className="w-4 h-4 text-red-500 shrink-0" />}
+                      {!['image', 'youtube'].includes(f.file_type) && <FileText className="w-4 h-4 text-primary shrink-0" />}
+                      <a href={f.file_url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline truncate flex-1">
+                        {f.label || (f.file_type === 'youtube' ? 'Video YouTube' : `File ${idx + 1}`)}
+                      </a>
+                      {idx === 0 && <Badge variant="outline" className="text-[10px]">Utama</Badge>}
+                      <Button variant="ghost" size="sm" onClick={() => removeFile(f.id)}>
+                        <Trash2 className="w-3 h-3" />
+                      </Button>
+                    </div>
+                  ))}
                 </div>
               )}
               <div className="flex flex-col sm:flex-row gap-2">
                 <input ref={fileRef} type="file" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.ppt,.pptx,.mp4,.webm" className="hidden"
                   onChange={e => { if (e.target.files?.[0]) handleUpload(e.target.files[0]); e.target.value = ''; }} />
                 <Button variant="outline" onClick={() => fileRef.current?.click()} disabled={uploading} className="flex-1">
-                  <Upload className="w-4 h-4 mr-2" />{uploading ? 'Mengupload...' : 'Upload File'}
+                  <Upload className="w-4 h-4 mr-2" />{uploading ? 'Mengupload...' : 'Tambah File'}
                 </Button>
               </div>
               <div className="flex flex-col sm:flex-row gap-2">
                 <Input placeholder="Atau paste link YouTube..." value={youtubeUrl} onChange={e => setYoutubeUrl(e.target.value)} />
-                <Button variant="outline" onClick={handleSetYoutube} disabled={!youtubeUrl}>
-                  <Youtube className="w-4 h-4 mr-2" />Simpan Link
+                <Button variant="outline" onClick={handleAddYoutube} disabled={!youtubeUrl}>
+                  <Youtube className="w-4 h-4 mr-2" />Tambah Link
                 </Button>
               </div>
             </div>
@@ -182,7 +239,9 @@ const ArtefakForm = () => {
 
   const handleAdd = () => {
     addArtefak({
-      judul: '', deskripsi: '', kategori: 'modul_ajar', file_url: '', file_type: '',
+      judul: '', deskripsi: '',
+      kategoris: ['modul_ajar'], files: [],
+      kategori: 'modul_ajar', file_url: '', file_type: '',
       konteks: '', tujuan: '', kelebihan: '', kekurangan: '',
       teori_pedagogi: '', faktor_keberhasilan: '', adaptasi_pembelajaran: '',
     });
@@ -194,7 +253,7 @@ const ArtefakForm = () => {
         <div className="flex items-start justify-between gap-3 flex-wrap">
           <div>
             <h1 className="text-2xl font-bold text-foreground">Artefak Mengajar</h1>
-            <p className="text-muted-foreground">Tambahkan artefak pembelajaran beserta analisis mendalamnya.</p>
+            <p className="text-muted-foreground">Satu artefak boleh memiliki beberapa kategori dan beberapa file/link.</p>
           </div>
           <Button onClick={handleAdd}><Plus className="w-4 h-4 mr-2" /> Tambah Artefak</Button>
         </div>
@@ -212,7 +271,7 @@ const ArtefakForm = () => {
         {data.artefak.length === 0 ? (
           <Card className="card-shadow">
             <CardContent className="py-10 text-center text-muted-foreground">
-              <p className="mb-4">Belum ada artefak. Tambahkan minimal satu artefak untuk setiap kategori penting.</p>
+              <p className="mb-4">Belum ada artefak. Tambahkan artefak pertama Anda.</p>
               <Button onClick={handleAdd}><Plus className="w-4 h-4 mr-2" /> Tambah Artefak Pertama</Button>
             </CardContent>
           </Card>
