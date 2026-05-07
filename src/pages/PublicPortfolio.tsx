@@ -43,7 +43,7 @@ const applyRow = (
 ) => {
   setData({
     profile: { ...defaultPortfolio.profile, ...((r.profile_data as any) || {}) },
-    artefak: normalizeArtefak(r.artefak_data),
+    artefak: normalizeArtefakLocal(r.artefak_data),
     reflection: { ...defaultPortfolio.reflection, ...((r.reflection_data as any) || {}) },
     model_guru: (r.model_guru_data as any) || defaultPortfolio.model_guru,
     lampiran: (r.lampiran_data as any) || defaultPortfolio.lampiran,
