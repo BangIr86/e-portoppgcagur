@@ -40,9 +40,10 @@ const PortfolioShowcase = ({ data, themeId, themeOverrides }: Props) => {
   useEffect(() => { injectThemeFont(theme); }, [theme]);
   const uppercase = resolveUppercase(theme, themeOverrides);
 
-  // Group artefak by kategori
+  // Group artefak by kategori — one artefak can appear in multiple groups
   const artefakByKategori = a.reduce((acc, item) => {
-    (acc[item.kategori] ||= []).push(item);
+    const kats = item.kategoris && item.kategoris.length ? item.kategoris : [item.kategori];
+    kats.forEach(k => { (acc[k] ||= []).push(item); });
     return acc;
   }, {} as Record<string, ArtefakItem[]>);
 
