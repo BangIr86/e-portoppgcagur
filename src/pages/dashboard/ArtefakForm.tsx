@@ -1,4 +1,5 @@
 import PageTransition from '@/components/PageTransition';
+import LampiranForm from './LampiranForm';
 import { usePortfolio, ArtefakItem, ArtefakKategori, KATEGORI_LABEL } from '@/contexts/PortfolioContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
@@ -220,6 +221,10 @@ const ArtefakForm = () => {
             {data.artefak.map(item => <ArtefakCard key={item.id} item={item} />)}
           </Accordion>
         )}
+
+        <div className="pt-6 border-t">
+          <LampiranForm />
+        </div>
       </div>
     </PageTransition>
   );
