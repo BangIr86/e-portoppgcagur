@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, Navigate } from 'react-router-dom';
 import { supabase } from '@/lib/supabase';
 import PortfolioShowcase from '@/components/PortfolioShowcase';
-import { PortfolioData, ArtefakItem } from '@/contexts/PortfolioContext';
+import { PortfolioData, ArtefakItem, normalizeArtefak } from '@/contexts/PortfolioContext';
 
 const defaultPortfolio: PortfolioData = {
   profile: {
