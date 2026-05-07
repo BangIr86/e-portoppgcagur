@@ -95,6 +95,8 @@ export const KATEGORI_LABEL: Record<ArtefakKategori, string> = {
   dokumentasi_mengajar: 'Dokumentasi Mengajar',
   hasil_kerja_siswa: 'Hasil Kerja Siswa',
   penilaian_pamong_dpl: 'Penilaian Guru Pamong & DPL',
+  instrumen_perangkat_pembelajaran: 'Instrumen Penilaian Perangkat Pembelajaran',
+  instrumen_praktik_mengajar: 'Instrumen Penilaian Praktik Mengajar',
 };
 
 const defaultProfile: ProfileData = {
