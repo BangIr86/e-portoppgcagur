@@ -32,7 +32,8 @@ const getYoutubeId = (url: string): string | null => {
 };
 
 const KATEGORI_OPTIONS: ArtefakKategori[] = [
-  'modul_ajar', 'media_pembelajaran', 'dokumentasi_mengajar', 'hasil_kerja_siswa', 'penilaian_pamong_dpl',
+  'modul_ajar', 'media_pembelajaran', 'dokumentasi_mengajar', 'hasil_kerja_siswa',
+  'penilaian_pamong_dpl', 'instrumen_perangkat_pembelajaran', 'instrumen_praktik_mengajar',
 ];
 
 const ANALISIS_FIELDS: { key: keyof ArtefakItem; label: string; placeholder: string }[] = [

@@ -23,7 +23,9 @@ export type ArtefakKategori =
   | 'media_pembelajaran'
   | 'dokumentasi_mengajar'
   | 'hasil_kerja_siswa'
-  | 'penilaian_pamong_dpl';
+  | 'penilaian_pamong_dpl'
+  | 'instrumen_perangkat_pembelajaran'
+  | 'instrumen_praktik_mengajar';
 
 export interface ArtefakFile {
   id: string;
@@ -93,6 +95,8 @@ export const KATEGORI_LABEL: Record<ArtefakKategori, string> = {
   dokumentasi_mengajar: 'Dokumentasi Mengajar',
   hasil_kerja_siswa: 'Hasil Kerja Siswa',
   penilaian_pamong_dpl: 'Penilaian Guru Pamong & DPL',
+  instrumen_perangkat_pembelajaran: 'Instrumen Penilaian Perangkat Pembelajaran',
+  instrumen_praktik_mengajar: 'Instrumen Penilaian Praktik Mengajar',
 };
 
 const defaultProfile: ProfileData = {
