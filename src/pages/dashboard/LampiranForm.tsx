@@ -1,4 +1,4 @@
-import PageTransition from '@/components/PageTransition';
+// Lampiran section, embedded inside ArtefakForm
 import { usePortfolio, LampiranItem } from '@/contexts/PortfolioContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
@@ -189,84 +189,82 @@ const LampiranForm = () => {
   };
 
   return (
-    <PageTransition>
-      <div className="max-w-3xl mx-auto space-y-6">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground">Lampiran Penilaian</h1>
-          <p className="text-muted-foreground">Upload Lampiran 7, Lampiran 8, dan dokumen pendukung lainnya.</p>
-        </div>
-
-        <Card className="card-shadow border-primary/20 bg-primary/5">
-          <CardContent className="pt-4 flex items-start gap-3">
-            <Paperclip className="w-5 h-5 text-primary mt-0.5" />
-            <div className="text-sm">
-              <p className="font-medium text-foreground">Lampiran Wajib</p>
-              <p className="text-muted-foreground">Pastikan Lampiran 7 dan Lampiran 8 sudah diupload sesuai ketentuan rubrik penilaian.</p>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="card-shadow">
-          <CardHeader>
-            <CardTitle className="text-base">Tambah Lampiran Baru</CardTitle>
-            <CardDescription>Pilih kategori, beri judul, lalu upload file atau tambahkan link YouTube</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div>
-                <Label className="text-sm">Kategori Lampiran</Label>
-                <Select value={tipe} onValueChange={setTipe}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="lampiran7">Lampiran 7</SelectItem>
-                    <SelectItem value="lampiran8">Lampiran 8</SelectItem>
-                    <SelectItem value="lampiran">Lampiran Pendukung</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label className="text-sm">Judul Lampiran</Label>
-                <Input placeholder="Masukkan judul..." value={judul} onChange={e => setJudul(e.target.value)} />
-              </div>
-            </div>
-
-            <div className="flex flex-col sm:flex-row gap-2">
-              <input ref={fileRef} type="file" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.ppt,.pptx,.mp4,.webm" className="hidden"
-                onChange={e => { if (e.target.files?.[0]) handleUpload(e.target.files[0]); e.target.value = ''; }} />
-              <Button variant="outline" onClick={() => fileRef.current?.click()} disabled={uploading} className="flex-1">
-                <Upload className="w-4 h-4 mr-2" />{uploading ? 'Mengupload...' : 'Upload File'}
-              </Button>
-            </div>
-
-            <div className="flex flex-col sm:flex-row gap-2">
-              <Input placeholder="Paste link YouTube..." value={youtubeUrl} onChange={e => setYoutubeUrl(e.target.value)} className="flex-1" />
-              <Button variant="outline" onClick={handleYoutubeAdd} disabled={!youtubeUrl}>
-                <Youtube className="w-4 h-4 mr-2" />Tambah Video
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="card-shadow">
-          <CardHeader>
-            <CardTitle className="text-base">Daftar Lampiran ({data.lampiran.length})</CardTitle>
-            {data.lampiran.length > 1 && <CardDescription>Seret ikon ⠿ untuk mengubah urutan</CardDescription>}
-          </CardHeader>
-          <CardContent className="space-y-2">
-            {data.lampiran.length === 0 && (
-              <p className="text-sm text-muted-foreground text-center py-4">Belum ada lampiran. Tambahkan lampiran di atas.</p>
-            )}
-            <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-              <SortableContext items={data.lampiran.map(l => l.id)} strategy={verticalListSortingStrategy}>
-                {data.lampiran.map(item => (
-                  <SortableItem key={item.id} item={item} onRemove={() => removeLampiran(item.id)} />
-                ))}
-              </SortableContext>
-            </DndContext>
-          </CardContent>
-        </Card>
+    <div className="space-y-6">
+      <div>
+        <h2 className="text-xl font-bold text-foreground">Lampiran Penilaian</h2>
+        <p className="text-sm text-muted-foreground">Upload Lampiran 7, Lampiran 8, dan dokumen pendukung lainnya.</p>
       </div>
-    </PageTransition>
+
+      <Card className="card-shadow border-primary/20 bg-primary/5">
+        <CardContent className="pt-4 flex items-start gap-3">
+          <Paperclip className="w-5 h-5 text-primary mt-0.5" />
+          <div className="text-sm">
+            <p className="font-medium text-foreground">Lampiran Wajib</p>
+            <p className="text-muted-foreground">Pastikan Lampiran 7 dan Lampiran 8 sudah diupload sesuai ketentuan rubrik penilaian.</p>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card className="card-shadow">
+        <CardHeader>
+          <CardTitle className="text-base">Tambah Lampiran Baru</CardTitle>
+          <CardDescription>Pilih kategori, beri judul, lalu upload file atau tambahkan link YouTube</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <Label className="text-sm">Kategori Lampiran</Label>
+              <Select value={tipe} onValueChange={setTipe}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="lampiran7">Lampiran 7</SelectItem>
+                  <SelectItem value="lampiran8">Lampiran 8</SelectItem>
+                  <SelectItem value="lampiran">Lampiran Pendukung</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label className="text-sm">Judul Lampiran</Label>
+              <Input placeholder="Masukkan judul..." value={judul} onChange={e => setJudul(e.target.value)} />
+            </div>
+          </div>
+
+          <div className="flex flex-col sm:flex-row gap-2">
+            <input ref={fileRef} type="file" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.ppt,.pptx,.mp4,.webm" className="hidden"
+              onChange={e => { if (e.target.files?.[0]) handleUpload(e.target.files[0]); e.target.value = ''; }} />
+            <Button variant="outline" onClick={() => fileRef.current?.click()} disabled={uploading} className="flex-1">
+              <Upload className="w-4 h-4 mr-2" />{uploading ? 'Mengupload...' : 'Upload File'}
+            </Button>
+          </div>
+
+          <div className="flex flex-col sm:flex-row gap-2">
+            <Input placeholder="Paste link YouTube..." value={youtubeUrl} onChange={e => setYoutubeUrl(e.target.value)} className="flex-1" />
+            <Button variant="outline" onClick={handleYoutubeAdd} disabled={!youtubeUrl}>
+              <Youtube className="w-4 h-4 mr-2" />Tambah Video
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card className="card-shadow">
+        <CardHeader>
+          <CardTitle className="text-base">Daftar Lampiran ({data.lampiran.length})</CardTitle>
+          {data.lampiran.length > 1 && <CardDescription>Seret ikon ⠿ untuk mengubah urutan</CardDescription>}
+        </CardHeader>
+        <CardContent className="space-y-2">
+          {data.lampiran.length === 0 && (
+            <p className="text-sm text-muted-foreground text-center py-4">Belum ada lampiran. Tambahkan lampiran di atas.</p>
+          )}
+          <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+            <SortableContext items={data.lampiran.map(l => l.id)} strategy={verticalListSortingStrategy}>
+              {data.lampiran.map(item => (
+                <SortableItem key={item.id} item={item} onRemove={() => removeLampiran(item.id)} />
+              ))}
+            </SortableContext>
+          </DndContext>
+        </CardContent>
+      </Card>
+    </div>
   );
 };
 
