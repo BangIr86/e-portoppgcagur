@@ -25,13 +25,24 @@ export type ArtefakKategori =
   | 'hasil_kerja_siswa'
   | 'penilaian_pamong_dpl';
 
+export interface ArtefakFile {
+  id: string;
+  file_url: string;
+  file_type: string; // 'pdf' | 'image' | 'video' | 'youtube' | 'doc' | 'ppt' | 'other' | ''
+  youtube_url?: string;
+  label?: string;
+}
+
 export interface ArtefakItem {
   id: string;
   judul: string;
   deskripsi: string;
+  kategoris: ArtefakKategori[];
+  files: ArtefakFile[];
+  // Legacy fields (kept for backward compatibility, mirrored from kategoris[0]/files[0])
   kategori: ArtefakKategori;
   file_url: string;
-  file_type: string; // 'pdf' | 'image' | 'video' | 'youtube' | 'doc' | 'ppt' | 'other' | ''
+  file_type: string;
   youtube_url?: string;
   // 7 field analisis
   konteks: string;
