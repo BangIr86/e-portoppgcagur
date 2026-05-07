@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, Navigate } from 'react-router-dom';
 import { supabase } from '@/lib/supabase';
 import PortfolioShowcase from '@/components/PortfolioShowcase';
-import { PortfolioData, ArtefakItem } from '@/contexts/PortfolioContext';
+import { PortfolioData, ArtefakItem, normalizeArtefak } from '@/contexts/PortfolioContext';
 
 const defaultPortfolio: PortfolioData = {
   profile: {
@@ -21,39 +21,16 @@ const defaultPortfolio: PortfolioData = {
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-const normalizeArtefak = (raw: any): ArtefakItem[] => {
-  if (Array.isArray(raw)) {
-    return raw.map((item: any) => ({
-      id: item?.id || crypto.randomUUID(),
-      judul: item?.judul || '',
-      deskripsi: item?.deskripsi || '',
-      kategori: item?.kategori || 'dokumentasi_mengajar',
-      file_url: item?.file_url || '',
-      file_type: item?.file_type || '',
-      youtube_url: item?.youtube_url,
-      konteks: item?.konteks || '',
-      tujuan: item?.tujuan || '',
-      kelebihan: item?.kelebihan || '',
-      kekurangan: item?.kekurangan || '',
-      teori_pedagogi: item?.teori_pedagogi || '',
-      faktor_keberhasilan: item?.faktor_keberhasilan || '',
-      adaptasi_pembelajaran: item?.adaptasi_pembelajaran || '',
-    }));
-  }
-  // legacy single object
+const normalizeArtefakLocal = (raw: any): ArtefakItem[] => {
+  if (Array.isArray(raw)) return raw.map(normalizeArtefak);
   if (raw && typeof raw === 'object' && (raw.kendala || raw.teori_pedagogi)) {
-    return [{
-      id: crypto.randomUUID(),
+    return [normalizeArtefak({
       judul: 'Artefak Pembelajaran',
-      deskripsi: '',
-      kategori: 'dokumentasi_mengajar',
-      file_url: '', file_type: '',
       konteks: raw.kendala || '',
-      tujuan: '', kelebihan: '', kekurangan: '',
       teori_pedagogi: raw.teori_pedagogi || '',
       faktor_keberhasilan: raw.faktor_keberhasilan || '',
       adaptasi_pembelajaran: raw.adaptasi_pembelajaran || '',
-    }];
+    })];
   }
   return [];
 };
@@ -66,7 +43,7 @@ const applyRow = (
 ) => {
   setData({
     profile: { ...defaultPortfolio.profile, ...((r.profile_data as any) || {}) },
-    artefak: normalizeArtefak(r.artefak_data),
+    artefak: normalizeArtefakLocal(r.artefak_data),
     reflection: { ...defaultPortfolio.reflection, ...((r.reflection_data as any) || {}) },
     model_guru: (r.model_guru_data as any) || defaultPortfolio.model_guru,
     lampiran: (r.lampiran_data as any) || defaultPortfolio.lampiran,

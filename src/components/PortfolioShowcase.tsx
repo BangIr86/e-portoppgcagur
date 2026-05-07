@@ -40,9 +40,10 @@ const PortfolioShowcase = ({ data, themeId, themeOverrides }: Props) => {
   useEffect(() => { injectThemeFont(theme); }, [theme]);
   const uppercase = resolveUppercase(theme, themeOverrides);
 
-  // Group artefak by kategori
+  // Group artefak by kategori — one artefak can appear in multiple groups
   const artefakByKategori = a.reduce((acc, item) => {
-    (acc[item.kategori] ||= []).push(item);
+    const kats = item.kategoris && item.kategoris.length ? item.kategoris : [item.kategori];
+    kats.forEach(k => { (acc[k] ||= []).push(item); });
     return acc;
   }, {} as Record<string, ArtefakItem[]>);
 
@@ -167,37 +168,64 @@ const PortfolioShowcase = ({ data, themeId, themeOverrides }: Props) => {
                     <Badge variant="secondary" className="ml-1">{items.length}</Badge>
                   </h3>
                   <motion.div className="grid grid-cols-1 sm:grid-cols-2 gap-5 auto-rows-fr" variants={staggerContainer}>
-                    {items.map(item => (
+                    {items.map(item => {
+                      const files = item.files && item.files.length
+                        ? item.files
+                        : (item.file_url ? [{ id: 'legacy', file_url: item.file_url, file_type: item.file_type, youtube_url: item.youtube_url }] : []);
+                      const primary = files[0];
+                      const extra = files.slice(1);
+                      return (
                       <motion.div key={item.id} variants={fadeUp} className="h-full">
                         <div className="rounded-xl bg-card border card-shadow overflow-hidden h-full flex flex-col">
                           <div className="aspect-video w-full bg-muted/30 shrink-0">
-                            {item.file_type === 'youtube' && item.youtube_url && (
+                            {primary?.file_type === 'youtube' && primary?.youtube_url && (
                               <iframe
-                                src={`https://www.youtube.com/embed/${item.youtube_url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([a-zA-Z0-9_-]{11})/)?.[1] || ''}`}
+                                src={`https://www.youtube.com/embed/${primary.youtube_url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([a-zA-Z0-9_-]{11})/)?.[1] || ''}`}
                                 className="w-full h-full" allowFullScreen
                                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" />
                             )}
-                            {item.file_type === 'image' && item.file_url && (
-                              <a href={item.file_url} target="_blank" rel="noopener noreferrer" className="block w-full h-full">
-                                <img src={item.file_url} alt={item.judul} className="w-full h-full object-cover" />
+                            {primary?.file_type === 'image' && primary?.file_url && (
+                              <a href={primary.file_url} target="_blank" rel="noopener noreferrer" className="block w-full h-full">
+                                <img src={primary.file_url} alt={item.judul} className="w-full h-full object-cover" />
                               </a>
                             )}
-                            {item.file_type === 'pdf' && item.file_url && (
-                              <iframe src={`${item.file_url}#toolbar=0&navpanes=0`} className="w-full h-full" title={item.judul} />
+                            {primary?.file_type === 'pdf' && primary?.file_url && (
+                              <iframe src={`${primary.file_url}#toolbar=0&navpanes=0`} className="w-full h-full" title={item.judul} />
                             )}
-                            {!item.file_url && (
+                            {!primary && (
                               <div className="w-full h-full flex items-center justify-center text-muted-foreground/50">
                                 <FileText className="w-10 h-10" />
                               </div>
                             )}
                           </div>
-                          <div className="p-4 flex-1 flex flex-col">
-                            <p className="font-semibold text-foreground mb-1">{item.judul || 'Tanpa judul'}</p>
+                          <div className="p-4 flex-1 flex flex-col gap-2">
+                            <p className="font-semibold text-foreground">{item.judul || 'Tanpa judul'}</p>
+                            {item.kategoris && item.kategoris.length > 1 && (
+                              <div className="flex flex-wrap gap-1">
+                                {item.kategoris.map(k => (
+                                  <Badge key={k} variant="secondary" className="text-[10px] font-normal">{KATEGORI_LABEL[k as keyof typeof KATEGORI_LABEL]}</Badge>
+                                ))}
+                              </div>
+                            )}
                             {item.deskripsi && <p className="text-sm text-muted-foreground leading-relaxed">{item.deskripsi}</p>}
+                            {extra.length > 0 && (
+                              <div className="mt-auto pt-2 border-t flex flex-wrap gap-2">
+                                {extra.map((f, i) => (
+                                  <a key={f.id} href={f.file_url} target="_blank" rel="noopener noreferrer"
+                                    className="inline-flex items-center gap-1.5 text-xs px-2 py-1 rounded bg-muted hover:bg-muted/70 text-foreground transition-colors">
+                                    {f.file_type === 'image' && <ImageIcon className="w-3 h-3" />}
+                                    {f.file_type === 'youtube' && <span className="text-red-500">▶</span>}
+                                    {!['image', 'youtube'].includes(f.file_type) && <FileText className="w-3 h-3" />}
+                                    {f.label || `File ${i + 2}`}
+                                  </a>
+                                ))}
+                              </div>
+                            )}
                           </div>
                         </div>
                       </motion.div>
-                    ))}
+                      );
+                    })}
                   </motion.div>
                 </motion.div>
               ))}
@@ -223,7 +251,7 @@ const PortfolioShowcase = ({ data, themeId, themeOverrides }: Props) => {
                   <AccordionTrigger className="px-5 py-4 hover:no-underline">
                     <div className="text-left flex-1 min-w-0">
                       <p className="font-semibold text-foreground truncate">{item.judul || 'Artefak tanpa judul'}</p>
-                      <p className="text-xs text-muted-foreground">{KATEGORI_LABEL[item.kategori]}</p>
+                      <p className="text-xs text-muted-foreground truncate">{(item.kategoris && item.kategoris.length ? item.kategoris : [item.kategori]).map(k => KATEGORI_LABEL[k as keyof typeof KATEGORI_LABEL]).join(' • ')}</p>
                     </div>
                   </AccordionTrigger>
                   <AccordionContent className="px-5 pb-5 space-y-5">

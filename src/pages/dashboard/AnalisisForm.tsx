@@ -55,7 +55,7 @@ const AnalisisForm = () => {
                         : <AlertCircle className="w-5 h-5 text-muted-foreground shrink-0" />}
                       <div className="flex-1 min-w-0 text-left">
                         <p className="font-medium text-foreground truncate">{item.judul || 'Artefak tanpa judul'}</p>
-                        <p className="text-xs text-muted-foreground">{KATEGORI_LABEL[item.kategori]}</p>
+                        <p className="text-xs text-muted-foreground truncate">{(item.kategoris && item.kategoris.length ? item.kategoris : [item.kategori]).map(k => KATEGORI_LABEL[k]).join(' • ')}</p>
                       </div>
                       <Badge variant={complete ? 'default' : 'outline'} className="text-xs">{filled}/{total}</Badge>
                     </div>
