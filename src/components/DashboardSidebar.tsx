@@ -22,11 +22,10 @@ const menuItems = [
   { title: 'Dashboard', url: '/dashboard', icon: LayoutDashboard },
   { title: 'Beranda', url: '/dashboard/beranda', icon: Home },
   { title: 'Profil Mahasiswa', url: '/dashboard/profil', icon: User },
-  { title: 'Artefak Mengajar', url: '/dashboard/artefak', icon: BookOpen },
+  { title: 'Artefak & Lampiran', url: '/dashboard/artefak', icon: BookOpen },
   { title: 'Analisis Artefak', url: '/dashboard/analisis', icon: FileSearch },
   { title: 'Refleksi Diri', url: '/dashboard/refleksi', icon: Heart },
   { title: 'Model Guru', url: '/dashboard/model-guru', icon: Star },
-  { title: 'Lampiran Penilaian', url: '/dashboard/lampiran', icon: Paperclip },
   { title: 'Tema Portfolio', url: '/dashboard/tema', icon: Palette },
   { title: 'Preview Portfolio', url: '/dashboard/preview', icon: Eye },
 ];

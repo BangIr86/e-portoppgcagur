@@ -16,7 +16,7 @@ import ProfilForm from "./pages/dashboard/ProfilForm";
 import ArtefakForm from "./pages/dashboard/ArtefakForm";
 import AnalisisForm from "./pages/dashboard/AnalisisForm";
 import RefleksiForm from "./pages/dashboard/RefleksiForm";
-import LampiranForm from "./pages/dashboard/LampiranForm";
+import { Navigate } from "react-router-dom";
 import ModelGuruForm from "./pages/dashboard/ModelGuruForm";
 import PreviewPage from "./pages/dashboard/PreviewPage";
 import TemaPage from "./pages/dashboard/TemaPage";
@@ -46,7 +46,7 @@ const App = () => (
               <Route path="analisis" element={<AnalisisForm />} />
               <Route path="refleksi" element={<RefleksiForm />} />
               <Route path="model-guru" element={<ModelGuruForm />} />
-              <Route path="lampiran" element={<LampiranForm />} />
+              <Route path="lampiran" element={<Navigate to="/dashboard/artefak" replace />} />
               <Route path="tema" element={<TemaPage />} />
               <Route path="preview" element={<PreviewPage />} />
             </Route>
