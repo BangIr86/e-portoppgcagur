@@ -251,7 +251,7 @@ const PortfolioShowcase = ({ data, themeId, themeOverrides }: Props) => {
                   <AccordionTrigger className="px-5 py-4 hover:no-underline">
                     <div className="text-left flex-1 min-w-0">
                       <p className="font-semibold text-foreground truncate">{item.judul || 'Artefak tanpa judul'}</p>
-                      <p className="text-xs text-muted-foreground">{KATEGORI_LABEL[item.kategori]}</p>
+                      <p className="text-xs text-muted-foreground truncate">{(item.kategoris && item.kategoris.length ? item.kategoris : [item.kategori]).map(k => KATEGORI_LABEL[k as keyof typeof KATEGORI_LABEL]).join(' • ')}</p>
                     </div>
                   </AccordionTrigger>
                   <AccordionContent className="px-5 pb-5 space-y-5">
