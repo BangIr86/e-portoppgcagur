@@ -23,7 +23,9 @@ export type ArtefakKategori =
   | 'media_pembelajaran'
   | 'dokumentasi_mengajar'
   | 'hasil_kerja_siswa'
-  | 'penilaian_pamong_dpl';
+  | 'penilaian_pamong_dpl'
+  | 'instrumen_perangkat_pembelajaran'
+  | 'instrumen_praktik_mengajar';
 
 export interface ArtefakFile {
   id: string;
