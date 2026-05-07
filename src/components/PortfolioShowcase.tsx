@@ -361,69 +361,7 @@ const PortfolioShowcase = ({ data, themeId, themeOverrides }: Props) => {
         </section>
       )}
 
-      {/* LAMPIRAN PENILAIAN */}
-      {data.lampiran.length > 0 && (
-        <section id="lampiran" className="py-10 sm:py-16 px-4 sm:px-6">
-          <div className="max-w-5xl mx-auto">
-            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
-              <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-2 text-center">Lampiran Penilaian</h2>
-              <p className="text-sm text-muted-foreground text-center mb-8 sm:mb-12">Dokumen pendukung dan lampiran wajib</p>
-            </motion.div>
-
-            {[
-              { tipe: 'lampiran7', label: 'Lampiran 7', items: lampiran7 },
-              { tipe: 'lampiran8', label: 'Lampiran 8', items: lampiran8 },
-              { tipe: 'lampiran', label: 'Lampiran Pendukung', items: lampiranOther },
-            ].filter(g => g.items.length > 0).map(group => (
-              <div key={group.tipe} className="mb-10">
-                <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2">
-                  <span className="w-1 h-5 bg-primary rounded-full" />
-                  {group.label}
-                  <Badge variant="secondary">{group.items.length}</Badge>
-                </h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 auto-rows-fr">
-                  {group.items.map((item, index) => (
-                    <motion.div key={item.id} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} transition={{ delay: index * 0.08 }} className="h-full">
-                      <div className="rounded-xl bg-card border card-shadow overflow-hidden h-full flex flex-col">
-                        <div className="aspect-video w-full bg-muted/30 shrink-0">
-                          {item.file_type === 'youtube' && item.youtube_url && (
-                            <iframe
-                              src={`https://www.youtube.com/embed/${item.youtube_url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([a-zA-Z0-9_-]{11})/)?.[1] || ''}`}
-                              className="w-full h-full" allowFullScreen
-                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" />
-                          )}
-                          {item.file_type === 'image' && (
-                            <a href={item.file_url} target="_blank" rel="noopener noreferrer" className="block w-full h-full">
-                              <img src={item.file_url} alt={item.judul || item.nama} className="w-full h-full object-cover" />
-                            </a>
-                          )}
-                          {item.file_type === 'pdf' && item.file_url && (
-                            <iframe src={`${item.file_url}#toolbar=0&navpanes=0`} className="w-full h-full" title={item.judul || item.nama} />
-                          )}
-                          {!['image', 'youtube', 'pdf'].includes(item.file_type) && (
-                            <div className="w-full h-full flex items-center justify-center">
-                              <FileText className="w-12 h-12 text-muted-foreground/40" />
-                            </div>
-                          )}
-                        </div>
-                        <a href={item.file_type === 'youtube' ? (item.youtube_url || '#') : item.file_url} target="_blank" rel="noopener noreferrer"
-                          className="flex items-center gap-3 p-4 hover:bg-muted/50 transition-colors mt-auto">
-                          {item.file_type === 'image' ? <ImageIcon className="w-5 h-5 text-primary shrink-0" /> :
-                           item.file_type === 'youtube' ? <span className="text-lg shrink-0">▶️</span> :
-                           <FileText className="w-5 h-5 text-primary shrink-0" />}
-                          <div className="min-w-0">
-                            <p className="text-sm font-medium text-foreground truncate">{item.judul || item.nama}</p>
-                          </div>
-                        </a>
-                      </div>
-                    </motion.div>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
+      {/* LAMPIRAN PENILAIAN — disembunyikan dari preview publik */}
 
       {/* FOOTER */}
       <footer className="py-10 px-6 text-center bg-foreground text-background">
