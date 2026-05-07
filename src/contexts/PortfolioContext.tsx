@@ -116,45 +116,57 @@ const defaultPortfolio: PortfolioData = {
 };
 
 // Migrasi data lama: jika `artefak` tersimpan sebagai object lama (bukan array), konversi ke array
+export const normalizeArtefak = (item: any): ArtefakItem => {
+  const kategori: ArtefakKategori = item?.kategori || 'dokumentasi_mengajar';
+  const kategoris: ArtefakKategori[] = Array.isArray(item?.kategoris) && item.kategoris.length
+    ? item.kategoris
+    : [kategori];
+  const legacyFile: ArtefakFile | null = item?.file_url
+    ? { id: crypto.randomUUID(), file_url: item.file_url, file_type: item.file_type || '', youtube_url: item.youtube_url }
+    : null;
+  const files: ArtefakFile[] = Array.isArray(item?.files) && item.files.length
+    ? item.files.map((f: any) => ({
+        id: f?.id || crypto.randomUUID(),
+        file_url: f?.file_url || '',
+        file_type: f?.file_type || '',
+        youtube_url: f?.youtube_url,
+        label: f?.label,
+      }))
+    : (legacyFile ? [legacyFile] : []);
+  const primary = files[0];
+  return {
+    id: item?.id || crypto.randomUUID(),
+    judul: item?.judul || '',
+    deskripsi: item?.deskripsi || '',
+    kategoris,
+    files,
+    kategori: kategoris[0],
+    file_url: primary?.file_url || '',
+    file_type: primary?.file_type || '',
+    youtube_url: primary?.youtube_url,
+    konteks: item?.konteks || '',
+    tujuan: item?.tujuan || '',
+    kelebihan: item?.kelebihan || '',
+    kekurangan: item?.kekurangan || '',
+    teori_pedagogi: item?.teori_pedagogi || '',
+    faktor_keberhasilan: item?.faktor_keberhasilan || '',
+    adaptasi_pembelajaran: item?.adaptasi_pembelajaran || '',
+  };
+};
+
 const migrateArtefak = (raw: any): ArtefakItem[] => {
   if (Array.isArray(raw)) return raw.map(normalizeArtefak);
   if (raw && typeof raw === 'object' && (raw.kendala || raw.teori_pedagogi || raw.faktor_keberhasilan || raw.adaptasi_pembelajaran)) {
-    // Konversi struktur lama → satu artefak baru
-    return [{
-      id: crypto.randomUUID(),
+    return [normalizeArtefak({
       judul: 'Artefak Pembelajaran',
-      deskripsi: '',
-      kategori: 'dokumentasi_mengajar',
-      file_url: '',
-      file_type: '',
       konteks: raw.kendala || '',
-      tujuan: '',
-      kelebihan: '',
-      kekurangan: '',
       teori_pedagogi: raw.teori_pedagogi || '',
       faktor_keberhasilan: raw.faktor_keberhasilan || '',
       adaptasi_pembelajaran: raw.adaptasi_pembelajaran || '',
-    }];
+    })];
   }
   return [];
 };
-
-const normalizeArtefak = (item: any): ArtefakItem => ({
-  id: item?.id || crypto.randomUUID(),
-  judul: item?.judul || '',
-  deskripsi: item?.deskripsi || '',
-  kategori: item?.kategori || 'dokumentasi_mengajar',
-  file_url: item?.file_url || '',
-  file_type: item?.file_type || '',
-  youtube_url: item?.youtube_url,
-  konteks: item?.konteks || '',
-  tujuan: item?.tujuan || '',
-  kelebihan: item?.kelebihan || '',
-  kekurangan: item?.kekurangan || '',
-  teori_pedagogi: item?.teori_pedagogi || '',
-  faktor_keberhasilan: item?.faktor_keberhasilan || '',
-  adaptasi_pembelajaran: item?.adaptasi_pembelajaran || '',
-});
 
 interface SectionStatus {
   beranda: boolean;
