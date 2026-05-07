@@ -40,12 +40,6 @@ const PortfolioShowcase = ({ data, themeId, themeOverrides }: Props) => {
   useEffect(() => { injectThemeFont(theme); }, [theme]);
   const uppercase = resolveUppercase(theme, themeOverrides);
 
-  // Group artefak by kategori — one artefak can appear in multiple groups
-  const artefakByKategori = a.reduce((acc, item) => {
-    const kats = item.kategoris && item.kategoris.length ? item.kategoris : [item.kategori];
-    kats.forEach(k => { (acc[k] ||= []).push(item); });
-    return acc;
-  }, {} as Record<string, ArtefakItem[]>);
 
   // Lampiran 7 & 8 highlight
   const lampiran7 = data.lampiran.filter(l => l.tipe === 'lampiran7');
