@@ -242,7 +242,7 @@ const ArtefakForm = () => {
   const handleAdd = () => {
     addArtefak({
       judul: '', deskripsi: '',
-      kategoris: ['modul_ajar'], files: [],
+      kategoris: [], files: [],
       kategori: 'modul_ajar', file_url: '', file_type: '',
       konteks: '', tujuan: '', kelebihan: '', kekurangan: '',
       teori_pedagogi: '', faktor_keberhasilan: '', adaptasi_pembelajaran: '',
