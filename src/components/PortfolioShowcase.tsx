@@ -201,7 +201,10 @@ const PortfolioShowcase = ({ data, themeId, themeOverrides }: Props) => {
                                 {f.file_type === 'image' && <ImageIcon className="w-3 h-3" />}
                                 {f.file_type === 'youtube' && <span className="text-red-500">▶</span>}
                                 {!['image', 'youtube'].includes(f.file_type) && <FileText className="w-3 h-3" />}
-                                {f.label || `File ${i + 2}`}
+                                <span className="truncate max-w-[160px]">{f.label || `File ${i + 2}`}</span>
+                                {f.kategori && (
+                                  <span className="opacity-70">· {KATEGORI_LABEL[f.kategori as keyof typeof KATEGORI_LABEL]}</span>
+                                )}
                               </a>
                             ))}
                           </div>
