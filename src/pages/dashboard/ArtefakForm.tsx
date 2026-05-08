@@ -255,7 +255,7 @@ const ArtefakForm = () => {
         <div className="flex items-start justify-between gap-3 flex-wrap">
           <div>
             <h1 className="text-2xl font-bold text-foreground">Artefak Mengajar</h1>
-            <p className="text-muted-foreground">Setiap artefak memiliki satu kategori dan satu file atau link.</p>
+            <p className="text-muted-foreground">Setiap artefak boleh berisi banyak file/link, dan setiap file punya kategorinya sendiri.</p>
           </div>
           <Button onClick={handleAdd}><Plus className="w-4 h-4 mr-2" /> Tambah Artefak</Button>
         </div>
