@@ -33,6 +33,7 @@ export interface ArtefakFile {
   file_type: string; // 'pdf' | 'image' | 'video' | 'youtube' | 'doc' | 'ppt' | 'other' | ''
   youtube_url?: string;
   label?: string;
+  kategori?: ArtefakKategori;
 }
 
 export interface ArtefakItem {
@@ -135,16 +136,20 @@ export const normalizeArtefak = (item: any): ArtefakItem => {
         file_type: f?.file_type || '',
         youtube_url: f?.youtube_url,
         label: f?.label,
+        kategori: f?.kategori || kategori,
       }))
-    : (legacyFile ? [legacyFile] : []);
+    : (legacyFile ? [{ ...legacyFile, kategori }] : []);
   const primary = files[0];
+  // Derive kategoris from per-file categories (fallback to provided)
+  const fileKats = files.map(f => f.kategori).filter(Boolean) as ArtefakKategori[];
+  const derivedKats = Array.from(new Set(fileKats.length ? fileKats : kategoris));
   return {
     id: item?.id || crypto.randomUUID(),
     judul: item?.judul || '',
     deskripsi: item?.deskripsi || '',
-    kategoris,
+    kategoris: derivedKats,
     files,
-    kategori: kategoris[0],
+    kategori: derivedKats[0] || kategori,
     file_url: primary?.file_url || '',
     file_type: primary?.file_type || '',
     youtube_url: primary?.youtube_url,
