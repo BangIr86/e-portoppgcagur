@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Checkbox } from '@/components/ui/checkbox';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Badge } from '@/components/ui/badge';
@@ -47,7 +47,7 @@ const ANALISIS_FIELDS: { key: keyof ArtefakItem; label: string; placeholder: str
 ];
 
 const isComplete = (a: ArtefakItem) =>
-  Boolean(a.judul && a.deskripsi && a.kategoris.length > 0 && ANALISIS_FIELDS.every(f => (a as any)[f.key]));
+  Boolean(a.judul && a.deskripsi && a.kategoris.length > 0 && a.files.length > 0 && ANALISIS_FIELDS.every(f => (a as any)[f.key]));
 
 const ArtefakCard = ({ item }: { item: ArtefakItem }) => {
   const { updateArtefak, removeArtefak } = usePortfolio();
@@ -57,14 +57,13 @@ const ArtefakCard = ({ item }: { item: ArtefakItem }) => {
   const [youtubeUrl, setYoutubeUrl] = useState('');
   const complete = isComplete(item);
 
-  const syncPrimary = (files: ArtefakFile[]) => {
-    const primary = files[0];
-    return {
-      files,
-      file_url: primary?.file_url || '',
-      file_type: primary?.file_type || '',
-      youtube_url: primary?.youtube_url,
-    };
+  const setSingleFile = (f: ArtefakFile | null) => {
+    updateArtefak(item.id, {
+      files: f ? [f] : [],
+      file_url: f?.file_url || '',
+      file_type: f?.file_type || '',
+      youtube_url: f?.youtube_url,
+    });
   };
 
   const handleUpload = async (file: File) => {
@@ -76,44 +75,33 @@ const ArtefakCard = ({ item }: { item: ArtefakItem }) => {
     const { error } = await supabase.storage.from('portfolio-files').upload(path, file, { upsert: true });
     if (error) { toast.error('Gagal upload file'); setUploading(false); return; }
     const { data: urlData } = supabase.storage.from('portfolio-files').getPublicUrl(path);
-    const newFile: ArtefakFile = {
+    setSingleFile({
       id: fileId,
       file_url: urlData.publicUrl,
       file_type: getFileType(file),
       label: file.name,
-    };
-    const nextFiles = [...item.files, newFile];
-    updateArtefak(item.id, syncPrimary(nextFiles));
+    });
     toast.success('File berhasil diupload');
     setUploading(false);
   };
 
   const handleAddYoutube = () => {
     if (!getYoutubeId(youtubeUrl)) { toast.error('URL YouTube tidak valid'); return; }
-    const newFile: ArtefakFile = {
+    setSingleFile({
       id: crypto.randomUUID(),
       file_url: youtubeUrl,
       file_type: 'youtube',
       youtube_url: youtubeUrl,
       label: 'Video YouTube',
-    };
-    const nextFiles = [...item.files, newFile];
-    updateArtefak(item.id, syncPrimary(nextFiles));
+    });
     setYoutubeUrl('');
     toast.success('Link YouTube ditambahkan');
   };
 
-  const removeFile = (id: string) => {
-    const nextFiles = item.files.filter(f => f.id !== id);
-    updateArtefak(item.id, syncPrimary(nextFiles));
-  };
+  const removeFile = () => setSingleFile(null);
 
-  const toggleKategori = (k: ArtefakKategori, checked: boolean) => {
-    const next = checked
-      ? Array.from(new Set([...item.kategoris, k]))
-      : item.kategoris.filter(x => x !== k);
-    if (next.length === 0) { toast.error('Minimal pilih satu kategori'); return; }
-    updateArtefak(item.id, { kategoris: next, kategori: next[0] });
+  const setKategori = (k: ArtefakKategori) => {
+    updateArtefak(item.id, { kategoris: [k], kategori: k });
   };
 
   return (
@@ -126,11 +114,11 @@ const ArtefakCard = ({ item }: { item: ArtefakItem }) => {
           <div className="flex-1 min-w-0 text-left">
             <p className="font-medium text-foreground truncate">{item.judul || 'Artefak tanpa judul'}</p>
             <div className="flex flex-wrap gap-1 mt-1">
-              {item.kategoris.map(k => (
-                <Badge key={k} variant="secondary" className="text-[10px] font-normal">{KATEGORI_LABEL[k]}</Badge>
-              ))}
+          {item.kategoris[0] && (
+                <Badge variant="secondary" className="text-[10px] font-normal">{KATEGORI_LABEL[item.kategoris[0]]}</Badge>
+              )}
               {item.files.length > 0 && (
-                <Badge variant="outline" className="text-[10px] font-normal">{item.files.length} file</Badge>
+                <Badge variant="outline" className="text-[10px] font-normal">1 file</Badge>
               )}
             </div>
           </div>
@@ -151,18 +139,15 @@ const ArtefakCard = ({ item }: { item: ArtefakItem }) => {
             </div>
 
             <div className="space-y-2">
-              <Label>Kategori (boleh lebih dari satu)</Label>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 p-3 rounded-md border bg-muted/30">
-                {KATEGORI_OPTIONS.map(k => {
-                  const checked = item.kategoris.includes(k);
-                  return (
-                    <label key={k} className="flex items-center gap-2 text-sm cursor-pointer">
-                      <Checkbox checked={checked} onCheckedChange={(v) => toggleKategori(k, Boolean(v))} />
-                      <span>{KATEGORI_LABEL[k]}</span>
-                    </label>
-                  );
-                })}
-              </div>
+              <Label>Kategori</Label>
+              <Select value={item.kategoris[0] || ''} onValueChange={(v) => setKategori(v as ArtefakKategori)}>
+                <SelectTrigger><SelectValue placeholder="Pilih kategori" /></SelectTrigger>
+                <SelectContent>
+                  {KATEGORI_OPTIONS.map(k => (
+                    <SelectItem key={k} value={k}>{KATEGORI_LABEL[k]}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="space-y-2">
@@ -171,38 +156,37 @@ const ArtefakCard = ({ item }: { item: ArtefakItem }) => {
             </div>
 
             <div className="space-y-2">
-              <Label>File / Media (boleh lebih dari satu)</Label>
-              {item.files.length > 0 && (
-                <div className="space-y-2">
-                  {item.files.map((f, idx) => (
-                    <div key={f.id} className="flex items-center gap-2 p-2 rounded bg-muted/50 text-sm">
-                      {f.file_type === 'image' && <ImageIcon className="w-4 h-4 text-primary shrink-0" />}
-                      {f.file_type === 'youtube' && <Youtube className="w-4 h-4 text-red-500 shrink-0" />}
-                      {!['image', 'youtube'].includes(f.file_type) && <FileText className="w-4 h-4 text-primary shrink-0" />}
-                      <a href={f.file_url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline truncate flex-1">
-                        {f.label || (f.file_type === 'youtube' ? 'Video YouTube' : `File ${idx + 1}`)}
-                      </a>
-                      {idx === 0 && <Badge variant="outline" className="text-[10px]">Utama</Badge>}
-                      <Button variant="ghost" size="sm" onClick={() => removeFile(f.id)}>
-                        <Trash2 className="w-3 h-3" />
-                      </Button>
-                    </div>
-                  ))}
+              <Label>File / Media (satu file atau satu link)</Label>
+              {item.files[0] && (
+                <div className="flex items-center gap-2 p-2 rounded bg-muted/50 text-sm">
+                  {item.files[0].file_type === 'image' && <ImageIcon className="w-4 h-4 text-primary shrink-0" />}
+                  {item.files[0].file_type === 'youtube' && <Youtube className="w-4 h-4 text-red-500 shrink-0" />}
+                  {!['image', 'youtube'].includes(item.files[0].file_type) && <FileText className="w-4 h-4 text-primary shrink-0" />}
+                  <a href={item.files[0].file_url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline truncate flex-1">
+                    {item.files[0].label || (item.files[0].file_type === 'youtube' ? 'Video YouTube' : 'File')}
+                  </a>
+                  <Button variant="ghost" size="sm" onClick={removeFile}>
+                    <Trash2 className="w-3 h-3" />
+                  </Button>
                 </div>
               )}
-              <div className="flex flex-col sm:flex-row gap-2">
-                <input ref={fileRef} type="file" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.ppt,.pptx,.mp4,.webm" className="hidden"
-                  onChange={e => { if (e.target.files?.[0]) handleUpload(e.target.files[0]); e.target.value = ''; }} />
-                <Button variant="outline" onClick={() => fileRef.current?.click()} disabled={uploading} className="flex-1">
-                  <Upload className="w-4 h-4 mr-2" />{uploading ? 'Mengupload...' : 'Tambah File'}
-                </Button>
-              </div>
-              <div className="flex flex-col sm:flex-row gap-2">
-                <Input placeholder="Atau paste link YouTube..." value={youtubeUrl} onChange={e => setYoutubeUrl(e.target.value)} />
-                <Button variant="outline" onClick={handleAddYoutube} disabled={!youtubeUrl}>
-                  <Youtube className="w-4 h-4 mr-2" />Tambah Link
-                </Button>
-              </div>
+              {!item.files[0] && (
+                <>
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    <input ref={fileRef} type="file" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.ppt,.pptx,.mp4,.webm" className="hidden"
+                      onChange={e => { if (e.target.files?.[0]) handleUpload(e.target.files[0]); e.target.value = ''; }} />
+                    <Button variant="outline" onClick={() => fileRef.current?.click()} disabled={uploading} className="flex-1">
+                      <Upload className="w-4 h-4 mr-2" />{uploading ? 'Mengupload...' : 'Upload File'}
+                    </Button>
+                  </div>
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    <Input placeholder="Atau paste link YouTube..." value={youtubeUrl} onChange={e => setYoutubeUrl(e.target.value)} />
+                    <Button variant="outline" onClick={handleAddYoutube} disabled={!youtubeUrl}>
+                      <Youtube className="w-4 h-4 mr-2" />Pakai Link
+                    </Button>
+                  </div>
+                </>
+              )}
             </div>
           </TabsContent>
 
@@ -254,7 +238,7 @@ const ArtefakForm = () => {
         <div className="flex items-start justify-between gap-3 flex-wrap">
           <div>
             <h1 className="text-2xl font-bold text-foreground">Artefak Mengajar</h1>
-            <p className="text-muted-foreground">Satu artefak boleh memiliki beberapa kategori dan beberapa file/link.</p>
+            <p className="text-muted-foreground">Setiap artefak memiliki satu kategori dan satu file atau link.</p>
           </div>
           <Button onClick={handleAdd}><Plus className="w-4 h-4 mr-2" /> Tambah Artefak</Button>
         </div>
