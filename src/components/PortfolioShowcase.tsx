@@ -41,6 +41,9 @@ const PortfolioShowcase = ({ data, themeId, themeOverrides }: Props) => {
   useEffect(() => { injectThemeFont(theme); }, [theme]);
   const uppercase = resolveUppercase(theme, themeOverrides);
 
+  const [openArtefak, setOpenArtefak] = useState<ArtefakItem | null>(null);
+  const [openKategori, setOpenKategori] = useState<string | null>(null);
+
 
   // Lampiran 7 & 8 highlight
   const lampiran7 = data.lampiran.filter(l => l.tipe === 'lampiran7');
