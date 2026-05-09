@@ -10,6 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import PdfViewer from '@/components/PdfViewer';
 import { getTheme, themeToStyle, injectThemeFont, resolveUppercase, type ThemeOverrides } from '@/lib/themes';
 
 const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: 'easeOut' } } };
@@ -467,7 +468,7 @@ const ArtefakDialog = ({ item, kategori, onClose, onSelectKategori, onBack }: Ar
                   </a>
                 )}
                 {f.file_type === 'pdf' && f.file_url && (
-                  <iframe src={`${f.file_url}#view=FitH`} className="w-full h-[70vh] bg-muted/30" title={f.label || item.judul} />
+                  <PdfViewer url={f.file_url} title={f.label || item.judul} />
                 )}
                 <div className="p-3 flex items-center justify-between gap-2">
                   <div className="flex items-center gap-2 min-w-0">
