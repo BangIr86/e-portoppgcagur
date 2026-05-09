@@ -181,7 +181,9 @@ const PortfolioShowcase = ({ data, themeId, themeOverrides }: Props) => {
                           <img src={primary.file_url} alt={item.judul} className="w-full h-full object-cover" />
                         )}
                         {primary?.file_type === 'pdf' && primary?.file_url && (
-                          <div className="w-full h-full flex items-center justify-center bg-muted/50"><FileText className="w-12 h-12 text-muted-foreground/60" /></div>
+                          <div className="w-full h-full relative pointer-events-none">
+                            <iframe src={`${primary.file_url}#toolbar=0&navpanes=0&view=FitH`} className="w-full h-full" title={item.judul} />
+                          </div>
                         )}
                         {!primary && (
                           <div className="w-full h-full flex items-center justify-center text-muted-foreground/50">
