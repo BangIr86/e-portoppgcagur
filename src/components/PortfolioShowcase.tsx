@@ -181,7 +181,9 @@ const PortfolioShowcase = ({ data, themeId, themeOverrides }: Props) => {
                           <img src={primary.file_url} alt={item.judul} className="w-full h-full object-cover" />
                         )}
                         {primary?.file_type === 'pdf' && primary?.file_url && (
-                          <div className="w-full h-full flex items-center justify-center bg-muted/50"><FileText className="w-12 h-12 text-muted-foreground/60" /></div>
+                          <div className="w-full h-full relative pointer-events-none">
+                            <iframe src={`${primary.file_url}#toolbar=0&navpanes=0&view=FitH`} className="w-full h-full" title={item.judul} />
+                          </div>
                         )}
                         {!primary && (
                           <div className="w-full h-full flex items-center justify-center text-muted-foreground/50">
@@ -465,7 +467,7 @@ const ArtefakDialog = ({ item, kategori, onClose, onSelectKategori, onBack }: Ar
                   </a>
                 )}
                 {f.file_type === 'pdf' && f.file_url && (
-                  <iframe src={`${f.file_url}#toolbar=0&navpanes=0`} className="w-full h-[60vh]" title={f.label || item.judul} />
+                  <iframe src={`${f.file_url}#view=FitH`} className="w-full h-[70vh] bg-muted/30" title={f.label || item.judul} />
                 )}
                 <div className="p-3 flex items-center justify-between gap-2">
                   <div className="flex items-center gap-2 min-w-0">
