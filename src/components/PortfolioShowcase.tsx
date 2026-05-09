@@ -1,14 +1,15 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { PortfolioData, KATEGORI_LABEL, ArtefakItem } from '@/contexts/PortfolioContext';
 import {
   AlertTriangle, BookOpen, CheckCircle, RefreshCw, FileText, Image as ImageIcon, GraduationCap,
   ChevronDown, Heart, TrendingUp, AlertCircle as AlertCircleIcon, Target, Sparkles, Quote, MapPin,
-  FileSearch, FlaskConical, Award, Star,
+  FileSearch, FlaskConical, Award, Star, ChevronRight, ArrowLeft, ExternalLink, Folder,
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { getTheme, themeToStyle, injectThemeFont, resolveUppercase, type ThemeOverrides } from '@/lib/themes';
 
 const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: 'easeOut' } } };
@@ -39,6 +40,9 @@ const PortfolioShowcase = ({ data, themeId, themeOverrides }: Props) => {
   const theme = getTheme(themeId);
   useEffect(() => { injectThemeFont(theme); }, [theme]);
   const uppercase = resolveUppercase(theme, themeOverrides);
+
+  const [openArtefak, setOpenArtefak] = useState<ArtefakItem | null>(null);
+  const [openKategori, setOpenKategori] = useState<string | null>(null);
 
 
   // Lampiran 7 & 8 highlight
@@ -159,29 +163,34 @@ const PortfolioShowcase = ({ data, themeId, themeOverrides }: Props) => {
                   ? item.files
                   : (item.file_url ? [{ id: 'legacy', file_url: item.file_url, file_type: item.file_type, youtube_url: item.youtube_url }] : []);
                 const primary = files[0];
-                const extra = files.slice(1);
                 const kats = item.kategoris && item.kategoris.length ? item.kategoris : [item.kategori];
                 return (
                   <motion.div key={item.id} variants={fadeUp} className="h-full">
-                    <div className="rounded-xl bg-card border card-shadow overflow-hidden h-full flex flex-col">
-                      <div className="aspect-video w-full bg-muted/30 shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => { setOpenArtefak(item); setOpenKategori(null); }}
+                      className="text-left rounded-xl bg-card border card-shadow overflow-hidden h-full w-full flex flex-col hover:shadow-lg hover:-translate-y-0.5 transition-all focus:outline-none focus:ring-2 focus:ring-primary/40"
+                    >
+                      <div className="aspect-video w-full bg-muted/30 shrink-0 relative">
                         {primary?.file_type === 'youtube' && primary?.youtube_url && (
-                          <iframe
-                            src={`https://www.youtube.com/embed/${primary.youtube_url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([a-zA-Z0-9_-]{11})/)?.[1] || ''}`}
-                            className="w-full h-full" allowFullScreen
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" />
+                          <img
+                            src={`https://img.youtube.com/vi/${primary.youtube_url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([a-zA-Z0-9_-]{11})/)?.[1] || ''}/hqdefault.jpg`}
+                            alt={item.judul} className="w-full h-full object-cover" />
                         )}
                         {primary?.file_type === 'image' && primary?.file_url && (
-                          <a href={primary.file_url} target="_blank" rel="noopener noreferrer" className="block w-full h-full">
-                            <img src={primary.file_url} alt={item.judul} className="w-full h-full object-cover" />
-                          </a>
+                          <img src={primary.file_url} alt={item.judul} className="w-full h-full object-cover" />
                         )}
                         {primary?.file_type === 'pdf' && primary?.file_url && (
-                          <iframe src={`${primary.file_url}#toolbar=0&navpanes=0`} className="w-full h-full" title={item.judul} />
+                          <div className="w-full h-full flex items-center justify-center bg-muted/50"><FileText className="w-12 h-12 text-muted-foreground/60" /></div>
                         )}
                         {!primary && (
                           <div className="w-full h-full flex items-center justify-center text-muted-foreground/50">
                             <FileText className="w-10 h-10" />
+                          </div>
+                        )}
+                        {files.length > 1 && (
+                          <div className="absolute top-2 right-2 px-2 py-1 rounded-full bg-background/90 text-foreground text-xs font-semibold shadow">
+                            {files.length} file
                           </div>
                         )}
                       </div>
@@ -192,43 +201,24 @@ const PortfolioShowcase = ({ data, themeId, themeOverrides }: Props) => {
                             <Badge key={k} variant="secondary" className="text-[10px] font-normal">{KATEGORI_LABEL[k as keyof typeof KATEGORI_LABEL]}</Badge>
                           ))}
                         </div>
-                        {item.deskripsi && <p className="text-sm text-muted-foreground leading-relaxed">{item.deskripsi}</p>}
-                        {extra.length > 0 && (
-                          <div className="mt-auto pt-2 border-t flex flex-wrap gap-2">
-                            {extra.map((f, i) => (
-                              <a key={f.id} href={f.file_url} target="_blank" rel="noopener noreferrer"
-                                className="inline-flex items-center gap-1.5 text-xs px-2 py-1 rounded bg-muted hover:bg-muted/70 text-foreground transition-colors">
-                                {f.file_type === 'image' && <ImageIcon className="w-3 h-3" />}
-                                {f.file_type === 'youtube' && <span className="text-red-500">▶</span>}
-                                {!['image', 'youtube'].includes(f.file_type) && <FileText className="w-3 h-3" />}
-                                <span className="truncate max-w-[160px]">{f.label || `File ${i + 2}`}</span>
-                                {f.kategori && (
-                                  <span className="opacity-70">· {KATEGORI_LABEL[f.kategori as keyof typeof KATEGORI_LABEL]}</span>
-                                )}
-                              </a>
-                            ))}
-                          </div>
-                        )}
+                        {item.deskripsi && <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">{item.deskripsi}</p>}
+                        <div className="mt-auto pt-2 text-xs text-primary font-medium inline-flex items-center gap-1">
+                          Lihat detail <ChevronRight className="w-3 h-3" />
+                        </div>
                       </div>
-                    </div>
+                    </button>
                   </motion.div>
                 );
               })}
             </motion.div>
-          </div>
-        </section>
-      )}
 
-      {/* ANALISIS ARTEFAK */}
-      {a.some(item => ANALISIS_FIELDS.some(f => (item as any)[f.key])) && (
-        <section id="analisis" className="py-10 sm:py-16 px-4 sm:px-6 bg-muted/30">
-          <div className="max-w-4xl mx-auto">
-            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
-              <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-2 text-center flex items-center justify-center gap-3">
-                <FileSearch className="w-7 h-7 text-primary" /> Analisis Artefak
-              </h2>
-              <p className="text-sm text-muted-foreground text-center mb-8 sm:mb-12">Analisis mendalam 7 dimensi untuk setiap artefak</p>
-            </motion.div>
+            <ArtefakDialog
+              item={openArtefak}
+              kategori={openKategori}
+              onClose={() => { setOpenArtefak(null); setOpenKategori(null); }}
+              onSelectKategori={setOpenKategori}
+              onBack={() => setOpenKategori(null)}
+            />
 
             <Accordion type="multiple" className="space-y-3">
               {a.map(item => (
@@ -385,6 +375,118 @@ const PortfolioShowcase = ({ data, themeId, themeOverrides }: Props) => {
         )}
       </footer>
     </div>
+  );
+};
+
+interface ArtefakDialogProps {
+  item: ArtefakItem | null;
+  kategori: string | null;
+  onClose: () => void;
+  onSelectKategori: (k: string) => void;
+  onBack: () => void;
+}
+
+const ArtefakDialog = ({ item, kategori, onClose, onSelectKategori, onBack }: ArtefakDialogProps) => {
+  if (!item) return null;
+  const files = item.files && item.files.length
+    ? item.files
+    : (item.file_url ? [{ id: 'legacy', file_url: item.file_url, file_type: item.file_type, youtube_url: item.youtube_url, kategori: item.kategori, label: '' } as any] : []);
+
+  const groups: Record<string, typeof files> = {};
+  files.forEach(f => {
+    const k = (f as any).kategori || item.kategori;
+    if (!groups[k]) groups[k] = [];
+    groups[k].push(f);
+  });
+  const kategoriList = Object.keys(groups);
+  const activeFiles = kategori ? groups[kategori] || [] : [];
+
+  return (
+    <Dialog open={!!item} onOpenChange={(o) => !o && onClose()}>
+      <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
+        <DialogHeader>
+          <div className="flex items-center gap-2">
+            {kategori && (
+              <Button variant="ghost" size="sm" onClick={onBack} className="h-8 px-2">
+                <ArrowLeft className="w-4 h-4" />
+              </Button>
+            )}
+            <div className="flex-1 min-w-0">
+              <DialogTitle className="truncate">{item.judul || 'Tanpa judul'}</DialogTitle>
+              <DialogDescription>
+                {kategori
+                  ? KATEGORI_LABEL[kategori as keyof typeof KATEGORI_LABEL]
+                  : `${kategoriList.length} kategori • ${files.length} file/link`}
+              </DialogDescription>
+            </div>
+          </div>
+        </DialogHeader>
+
+        {!kategori && (
+          <div className="space-y-2">
+            {item.deskripsi && <p className="text-sm text-muted-foreground leading-relaxed mb-2">{item.deskripsi}</p>}
+            {kategoriList.map(k => (
+              <button
+                key={k}
+                onClick={() => onSelectKategori(k)}
+                className="w-full text-left p-4 rounded-lg border bg-card hover:bg-muted/50 transition-colors flex items-center gap-3 group"
+              >
+                <div className="w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                  <Folder className="w-5 h-5" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="font-medium text-foreground">{KATEGORI_LABEL[k as keyof typeof KATEGORI_LABEL]}</p>
+                  <p className="text-xs text-muted-foreground">{groups[k].length} file/link</p>
+                </div>
+                <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
+              </button>
+            ))}
+            {kategoriList.length === 0 && (
+              <p className="text-sm text-muted-foreground text-center py-6">Belum ada file/link.</p>
+            )}
+          </div>
+        )}
+
+        {kategori && (
+          <div className="space-y-4">
+            {activeFiles.map((f: any, i) => (
+              <div key={f.id || i} className="rounded-lg border overflow-hidden bg-card">
+                {f.file_type === 'youtube' && f.youtube_url && (
+                  <div className="aspect-video w-full bg-black">
+                    <iframe
+                      src={`https://www.youtube.com/embed/${f.youtube_url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([a-zA-Z0-9_-]{11})/)?.[1] || ''}`}
+                      className="w-full h-full" allowFullScreen
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" />
+                  </div>
+                )}
+                {f.file_type === 'image' && f.file_url && (
+                  <a href={f.file_url} target="_blank" rel="noopener noreferrer" className="block">
+                    <img src={f.file_url} alt={f.label || item.judul} className="w-full max-h-[60vh] object-contain bg-muted/30" />
+                  </a>
+                )}
+                {f.file_type === 'pdf' && f.file_url && (
+                  <iframe src={`${f.file_url}#toolbar=0&navpanes=0`} className="w-full h-[60vh]" title={f.label || item.judul} />
+                )}
+                <div className="p-3 flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2 min-w-0">
+                    {f.file_type === 'image' && <ImageIcon className="w-4 h-4 text-muted-foreground shrink-0" />}
+                    {f.file_type === 'youtube' && <span className="text-red-500 shrink-0">▶</span>}
+                    {!['image', 'youtube'].includes(f.file_type || '') && <FileText className="w-4 h-4 text-muted-foreground shrink-0" />}
+                    <span className="text-sm font-medium truncate">{f.label || `File ${i + 1}`}</span>
+                  </div>
+                  {(f.file_url || f.youtube_url) && (
+                    <a href={f.file_url || f.youtube_url} target="_blank" rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-xs text-primary hover:underline shrink-0">
+                      Buka <ExternalLink className="w-3 h-3" />
+                    </a>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </DialogContent>
+    </Dialog>
   );
 };
 
