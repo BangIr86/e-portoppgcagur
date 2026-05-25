@@ -63,14 +63,14 @@ const PortfolioShowcase = ({ data, themeId, themeOverrides }: Props) => {
   return (
     <div style={themeToStyle(theme, themeOverrides)} data-uppercase-headings={uppercase ? 'true' : 'false'} className="portfolio-themed min-h-screen bg-background text-foreground w-full max-w-full overflow-x-hidden">
       
-      {/* KODE NAVBAR MULAI DARI SINI */}
-      <nav className="fixed top-0 left-0 z-50 w-full backdrop-blur-xl bg-background/70 border-b border-primary/10 shadow-sm transition-all duration-300">
+      {/* KODE NAVBAR DI SINI - Ketinggian diturunkan ke h-14 */}
+      <nav className="fixed top-0 left-0 z-40 w-full backdrop-blur-xl bg-background/70 border-b border-primary/10 shadow-sm transition-all duration-300">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16 sm:h-20">
-            {/* Logo / Nama Lengkap */}
+          <div className="flex items-center justify-between h-14">
+            {/* Logo diganti menjadi teks E-Portofolio statik */}
             <div className="flex-shrink-0">
               <a href="#beranda" className="font-bold text-xl sm:text-2xl tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-primary to-violet-500 hover:opacity-80 transition-opacity">
-                {p.full_name || 'E-Porto'}
+                E-Portofolio
               </a>
             </div>
             
@@ -97,7 +97,7 @@ const PortfolioShowcase = ({ data, themeId, themeOverrides }: Props) => {
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                 className="text-foreground/80 hover:text-primary p-2 focus:outline-none transition-colors"
               >
-                {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+                {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
               </button>
             </div>
           </div>
@@ -121,8 +121,8 @@ const PortfolioShowcase = ({ data, themeId, themeOverrides }: Props) => {
       </nav>
       {/* KODE NAVBAR SELESAI */}
 
-      {/* HERO BERANDA */}
-      <section id="beranda" className="showcase-hero text-primary-foreground pt-28 pb-12 sm:pt-36 sm:pb-24 px-4 sm:px-6">
+      {/* HERO BERANDA - Jarak padding dilaraskan semula */}
+      <section id="beranda" className="showcase-hero text-primary-foreground pt-24 pb-12 sm:pt-28 sm:pb-24 px-4 sm:px-6">
         <div className="max-w-4xl mx-auto text-center">
           <motion.div initial="hidden" animate="visible" variants={fadeUp}>
             {p.foto_url && (
@@ -167,7 +167,8 @@ const PortfolioShowcase = ({ data, themeId, themeOverrides }: Props) => {
       )}
 
       {/* PROFIL — STORYTELLING */}
-      <section id="profil" className="py-10 sm:py-16 px-4 sm:px-6 bg-muted/30">
+      {/* scroll-mt-20 ditetapkan agar kandungan tidak terpotong navbar nipis */}
+      <section id="profil" className="scroll-mt-20 py-10 sm:py-16 px-4 sm:px-6 bg-muted/30">
         <div className="max-w-3xl mx-auto">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
             <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-2 text-center">Profil Mahasiswa</h2>
@@ -218,8 +219,9 @@ const PortfolioShowcase = ({ data, themeId, themeOverrides }: Props) => {
       </section>
 
       {/* ARTEFAK MENGAJAR */}
+      {/* scroll-mt-20 ditetapkan agar kandungan tidak terpotong navbar nipis */}
       {a.length > 0 && (
-        <section id="artefak" className="py-10 sm:py-16 px-4 sm:px-6">
+        <section id="artefak" className="scroll-mt-20 py-10 sm:py-16 px-4 sm:px-6">
           <div className="max-w-5xl mx-auto">
             <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
               <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-2 text-center">Artefak Mengajar</h2>
@@ -322,8 +324,9 @@ const PortfolioShowcase = ({ data, themeId, themeOverrides }: Props) => {
       )}
 
       {/* REFLEKSI DIRI */}
+      {/* scroll-mt-20 ditetapkan agar kandungan tidak terpotong navbar nipis */}
       {(r.pengalaman_mengajar || r.kekuatan_diri || r.kelemahan_diri || r.rencana_tindak_lanjut || r.filosofi_mengajar) && (
-        <section id="refleksi" className="py-10 sm:py-16 px-4 sm:px-6">
+        <section id="refleksi" className="scroll-mt-20 py-10 sm:py-16 px-4 sm:px-6">
           <div className="max-w-4xl mx-auto">
             <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
               <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-2 text-center flex items-center justify-center gap-3">
@@ -369,8 +372,9 @@ const PortfolioShowcase = ({ data, themeId, themeOverrides }: Props) => {
       )}
 
       {/* MODEL GURU */}
+      {/* scroll-mt-20 ditetapkan agar kandungan tidak terpotong navbar nipis */}
       {(m.visi || m.misi || m.kompetensi.length > 0 || m.karakter.length > 0) && (
-        <section id="model-guru" className="py-10 sm:py-16 px-4 sm:px-6 bg-muted/30">
+        <section id="model-guru" className="scroll-mt-20 py-10 sm:py-16 px-4 sm:px-6 bg-muted/30">
           <div className="max-w-5xl mx-auto">
             <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
               <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-2 text-center flex items-center justify-center gap-3">
