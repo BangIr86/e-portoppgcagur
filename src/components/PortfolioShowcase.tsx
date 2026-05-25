@@ -211,7 +211,7 @@ const PortfolioShowcase = ({ data, themeId, themeOverrides }: Props) => {
         </div>
       </section>
 
-      {/* ARTEFAK MENGAJAR & ANALISIS - Desain Judul Tengah & Kolom Bawah */}
+      {/* ARTEFAK MENGAJAR & ANALISIS - Desain List Sejajar Kiri Kanan */}
       {a.length > 0 && (
         <section id="artefak" className="scroll-mt-20 py-10 sm:py-16 px-4 sm:px-6">
           <div className="max-w-6xl mx-auto">
@@ -246,26 +246,39 @@ const PortfolioShowcase = ({ data, themeId, themeOverrides }: Props) => {
                     {/* Bagian Bawah: Dibagi Kiri dan Kanan */}
                     <div className="flex flex-col md:flex-row flex-1">
                       
-                      {/* Kolom Kiri: Informasi Artefak & File */}
+                      {/* Kolom Kiri: Artefak Pembelajaran (List File Langsung) */}
                       <div className="p-6 md:p-8 flex-1 md:w-1/2 border-b md:border-b-0 md:border-r border-border flex flex-col">
                         <h4 className="font-semibold text-lg text-foreground mb-4 flex items-center gap-2">
-                          <FileText className="w-5 h-5 text-primary" /> Deskripsi Artefak
+                          <Folder className="w-5 h-5 text-primary" /> Artefak Pembelajaran
                         </h4>
-                        <div className="flex-1">
-                          {item.deskripsi ? (
-                            <p className="text-base text-muted-foreground leading-relaxed mb-6">{item.deskripsi}</p>
+                        <div className="flex-1 flex flex-col gap-3">
+                          {files.length > 0 ? (
+                            files.map((f: any, i: number) => (
+                              <div key={f.id || i} className="flex items-center justify-between p-3.5 rounded-xl border border-border/60 bg-background hover:bg-muted/40 transition-all shadow-sm">
+                                <div className="flex items-center gap-3 min-w-0">
+                                  <div className="w-9 h-9 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                                    {f.file_type === 'image' ? <ImageIcon className="w-4 h-4" /> :
+                                     f.file_type === 'youtube' ? <span className="text-red-500 font-bold text-xs">▶</span> :
+                                     <FileText className="w-4 h-4" />}
+                                  </div>
+                                  <span className="text-sm sm:text-base font-medium text-foreground truncate">
+                                    {f.label || `File Artefak ${i + 1}`}
+                                  </span>
+                                </div>
+                                {(f.file_url || f.youtube_url) && (
+                                  <a href={f.file_url || f.youtube_url} target="_blank" rel="noopener noreferrer"
+                                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-xs font-semibold hover:bg-primary/90 transition-colors shrink-0 shadow-sm">
+                                    Buka <ExternalLink className="w-3 h-3" />
+                                  </a>
+                                )}
+                              </div>
+                            ))
                           ) : (
-                            <p className="text-base text-muted-foreground italic mb-6">Tidak ada deskripsi untuk artefak ini.</p>
+                            <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground opacity-60 py-8">
+                              <FileText className="w-12 h-12 mb-3 opacity-20" />
+                              <p className="text-sm">Belum ada file untuk artefak ini.</p>
+                            </div>
                           )}
-                        </div>
-                        <div className="mt-auto pt-4 border-t border-border/50">
-                          <Button 
-                            onClick={() => { setOpenArtefak(item); setOpenKategori(null); }}
-                            className="w-full flex items-center justify-center gap-2 shadow-sm"
-                            size="lg"
-                          >
-                            <Folder className="w-5 h-5" /> Buka File Artefak ({files.length})
-                          </Button>
                         </div>
                       </div>
 
@@ -308,6 +321,7 @@ const PortfolioShowcase = ({ data, themeId, themeOverrides }: Props) => {
               })}
             </motion.div>
 
+            {/* Dialog Component dibiarkan di sini (jika di kemudian hari ingin dipakai ulang) */}
             <ArtefakDialog
               item={openArtefak}
               kategori={openKategori}
