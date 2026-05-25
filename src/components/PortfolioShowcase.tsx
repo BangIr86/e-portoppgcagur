@@ -56,6 +56,7 @@ const PortfolioShowcase = ({ data, themeId, themeOverrides }: Props) => {
   return (
     <div style={themeToStyle(theme, themeOverrides)} data-uppercase-headings={uppercase ? 'true' : 'false'} className="portfolio-themed min-h-screen bg-background text-foreground w-full max-w-full overflow-x-hidden">
       
+      {/* NAVBAR */}
       <nav className="fixed top-0 left-0 z-40 w-full backdrop-blur-xl bg-background/70 border-b border-primary/10 shadow-sm transition-all duration-300">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-14">
@@ -64,7 +65,6 @@ const PortfolioShowcase = ({ data, themeId, themeOverrides }: Props) => {
                 E-Portofolio
               </a>
             </div>
-            
             <div className="hidden md:block">
               <div className="ml-10 flex items-center space-x-2">
                 {navLinks.map((link) => (
@@ -75,7 +75,6 @@ const PortfolioShowcase = ({ data, themeId, themeOverrides }: Props) => {
                 ))}
               </div>
             </div>
-
             <div className="md:hidden flex items-center">
               <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="text-foreground/80 hover:text-primary p-2 focus:outline-none transition-colors">
                 {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -83,19 +82,9 @@ const PortfolioShowcase = ({ data, themeId, themeOverrides }: Props) => {
             </div>
           </div>
         </div>
-
-        {isMobileMenuOpen && (
-          <div className="md:hidden absolute top-full left-0 w-full bg-background border-b border-primary/10 shadow-lg py-2 px-4 flex flex-col space-y-1 slide-in-top">
-            {navLinks.map((link) => (
-              <a key={link.name} href={link.href} onClick={() => setIsMobileMenuOpen(false)} className="block px-4 py-3 rounded-lg text-base font-medium text-foreground/80 hover:text-primary hover:bg-primary/5 transition-colors">
-                {link.name}
-              </a>
-            ))}
-          </div>
-        )}
       </nav>
 
-      {/* Main Content Sections... (Hero, Profil, etc. remain the same) */}
+      {/* HERO SECTION */}
       <section id="beranda" className="showcase-hero text-primary-foreground pt-24 pb-12 sm:pt-28 sm:pb-24 px-4 sm:px-6">
         <div className="max-w-4xl mx-auto text-center">
           <motion.div initial="hidden" animate="visible" variants={fadeUp}>
@@ -110,7 +99,7 @@ const PortfolioShowcase = ({ data, themeId, themeOverrides }: Props) => {
         <section id="artefak" className="scroll-mt-20 py-10 sm:py-16 px-4 sm:px-6">
           <div className="max-w-6xl mx-auto">
             <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
-              <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-2 text-center">Artefak Mengajar & Analisis</h2>
+              <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-12 text-center">Artefak Mengajar & Analisis</h2>
             </motion.div>
 
             <motion.div className="space-y-10" variants={staggerContainer} initial="hidden" whileInView="visible" viewport={{ once: true }}>
@@ -123,7 +112,6 @@ const PortfolioShowcase = ({ data, themeId, themeOverrides }: Props) => {
                     <div className="p-6 md:px-8 border-b border-border/50 text-center bg-muted/5">
                       <h3 className="text-xl sm:text-2xl font-bold text-foreground">{item.judul || 'Tanpa judul'}</h3>
                     </div>
-
                     <div className="flex flex-col md:flex-row flex-1">
                       {/* Kolom Kiri: Kategori Saja */}
                       <div className="p-6 md:p-8 flex-1 md:w-1/2 border-b md:border-b-0 md:border-r border-border">
@@ -144,7 +132,7 @@ const PortfolioShowcase = ({ data, themeId, themeOverrides }: Props) => {
                         </div>
                       </div>
 
-                      {/* Kolom Kanan: Analisis Pembelajaran */}
+                      {/* Kolom Kanan: Analisis */}
                       <div className="p-6 md:p-8 flex-1 md:w-1/2 bg-muted/10">
                         <h4 className="font-semibold text-lg text-foreground mb-5 flex items-center gap-2">
                           <FileSearch className="w-5 h-5 text-primary" /> Analisis Pembelajaran
@@ -159,7 +147,7 @@ const PortfolioShowcase = ({ data, themeId, themeOverrides }: Props) => {
                                   <AccordionTrigger className="py-3 hover:no-underline text-left">
                                     <div className="flex items-center gap-2 font-medium text-sm sm:text-base"><f.icon className="w-4 h-4 text-primary" /> {f.label}</div>
                                   </AccordionTrigger>
-                                  <AccordionContent className="text-sm sm:text-base text-foreground/85 leading-relaxed whitespace-pre-line pb-4 pt-1">{val}</AccordionContent>
+                                  <AccordionContent className="text-sm sm:text-base text-foreground/85 leading-relaxed pb-4 pt-1">{val}</AccordionContent>
                                 </AccordionItem>
                               );
                             })}
@@ -178,12 +166,10 @@ const PortfolioShowcase = ({ data, themeId, themeOverrides }: Props) => {
           </div>
         </section>
       )}
-      
-      {/* Footer & Other sections remain unchanged... */}
     </div>
   );
 };
 
-// ... (ArtefakDialog component remains same)
+// ... (Komponen ArtefakDialog tetap sama seperti sebelumnya)
 
 export default PortfolioShowcase;
