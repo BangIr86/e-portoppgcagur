@@ -45,7 +45,6 @@ const PortfolioShowcase = ({ data, themeId, themeOverrides }: Props) => {
   const [openArtefak, setOpenArtefak] = useState<ArtefakItem | null>(null);
   const [openKategori, setOpenKategori] = useState<string | null>(null);
 
-
   // Lampiran 7 & 8 highlight
   const lampiran7 = data.lampiran.filter(l => l.tipe === 'lampiran7');
   const lampiran8 = data.lampiran.filter(l => l.tipe === 'lampiran8');
@@ -53,6 +52,29 @@ const PortfolioShowcase = ({ data, themeId, themeOverrides }: Props) => {
 
   return (
     <div style={themeToStyle(theme, themeOverrides)} data-uppercase-headings={uppercase ? 'true' : 'false'} className="portfolio-themed min-h-screen bg-background text-foreground w-full max-w-full overflow-x-hidden">
+      
+      {/* KODE NAVBAR MULAI DARI SINI */}
+      <nav className="sticky top-0 z-50 w-full backdrop-blur-md bg-background/80 border-b border-border shadow-sm">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            <div className="flex-shrink-0">
+              <a href="#beranda" className="font-bold text-xl text-primary tracking-tight">
+                {p.full_name ? p.full_name.split(' ')[0] : 'E-Porto'}
+              </a>
+            </div>
+            <div className="hidden md:block">
+              <div className="ml-10 flex items-baseline space-x-6">
+                <a href="#profil" className="text-foreground/80 hover:text-primary transition-colors px-3 py-2 rounded-md text-sm font-medium">Profil</a>
+                <a href="#artefak" className="text-foreground/80 hover:text-primary transition-colors px-3 py-2 rounded-md text-sm font-medium">Artefak</a>
+                <a href="#refleksi" className="text-foreground/80 hover:text-primary transition-colors px-3 py-2 rounded-md text-sm font-medium">Refleksi</a>
+                <a href="#model-guru" className="text-foreground/80 hover:text-primary transition-colors px-3 py-2 rounded-md text-sm font-medium">Model Guru</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </nav>
+      {/* KODE NAVBAR SELESAI */}
+
       {/* HERO BERANDA */}
       <section id="beranda" className="showcase-hero text-primary-foreground py-12 sm:py-24 px-4 sm:px-6">
         <div className="max-w-4xl mx-auto text-center">
