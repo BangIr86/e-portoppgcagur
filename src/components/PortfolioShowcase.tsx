@@ -67,14 +67,12 @@ const PortfolioShowcase = ({ data, themeId, themeOverrides }: Props) => {
       <nav className="fixed top-0 left-0 z-40 w-full backdrop-blur-xl bg-background/70 border-b border-primary/10 shadow-sm transition-all duration-300">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-14">
-            {/* Logo diganti menjadi teks E-Portofolio statik */}
             <div className="flex-shrink-0">
               <a href="#beranda" className="font-bold text-xl sm:text-2xl tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-primary to-violet-500 hover:opacity-80 transition-opacity">
                 E-Portofolio
               </a>
             </div>
             
-            {/* Navigasi Desktop */}
             <div className="hidden md:block">
               <div className="ml-10 flex items-center space-x-2">
                 {navLinks.map((link) => (
@@ -84,14 +82,12 @@ const PortfolioShowcase = ({ data, themeId, themeOverrides }: Props) => {
                     className="relative group px-4 py-2 rounded-full text-sm font-medium text-foreground/80 hover:text-primary hover:bg-primary/5 transition-all duration-300"
                   >
                     {link.name}
-                    {/* Animasi garis bawah elegan */}
                     <span className="absolute inset-x-4 bottom-1 h-0.5 bg-primary transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300 rounded-full"></span>
                   </a>
                 ))}
               </div>
             </div>
 
-            {/* Tombol Menu Mobile */}
             <div className="md:hidden flex items-center">
               <button 
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -103,7 +99,6 @@ const PortfolioShowcase = ({ data, themeId, themeOverrides }: Props) => {
           </div>
         </div>
 
-        {/* Menu Dropdown Mobile */}
         {isMobileMenuOpen && (
           <div className="md:hidden absolute top-full left-0 w-full bg-background border-b border-primary/10 shadow-lg py-2 px-4 flex flex-col space-y-1 slide-in-top">
             {navLinks.map((link) => (
@@ -216,7 +211,7 @@ const PortfolioShowcase = ({ data, themeId, themeOverrides }: Props) => {
         </div>
       </section>
 
-      {/* ARTEFAK MENGAJAR & ANALISIS - Desain Accordion Klik-untuk-Buka */}
+      {/* ARTEFAK MENGAJAR & ANALISIS - Desain Judul Tengah & Kolom Bawah */}
       {a.length > 0 && (
         <section id="artefak" className="scroll-mt-20 py-10 sm:py-16 px-4 sm:px-6">
           <div className="max-w-6xl mx-auto">
@@ -225,7 +220,7 @@ const PortfolioShowcase = ({ data, themeId, themeOverrides }: Props) => {
               <p className="text-sm text-muted-foreground text-center mb-8 sm:mb-12">Dokumentasi karya dan analisis pembelajaran</p>
             </motion.div>
 
-            <motion.div className="space-y-8" variants={staggerContainer} initial="hidden" whileInView="visible" viewport={{ once: true }}>
+            <motion.div className="space-y-10" variants={staggerContainer} initial="hidden" whileInView="visible" viewport={{ once: true }}>
               {a.map(item => {
                 const files = item.files && item.files.length
                   ? item.files
@@ -234,65 +229,80 @@ const PortfolioShowcase = ({ data, themeId, themeOverrides }: Props) => {
                 const hasAnalisis = ANALISIS_FIELDS.some(f => (item as any)[f.key]);
 
                 return (
-                  <motion.div key={item.id} variants={fadeUp} className="bg-card border card-shadow rounded-2xl overflow-hidden flex flex-col md:flex-row">
+                  <motion.div key={item.id} variants={fadeUp} className="bg-card border card-shadow rounded-2xl overflow-hidden flex flex-col">
                     
-                    {/* Kolom Kiri: Informasi Artefak */}
-                    <div className="p-6 md:p-8 flex-1 md:w-1/2 border-b md:border-b-0 md:border-r border-border flex flex-col">
-                      <div className="flex-1">
-                        <h3 className="text-xl sm:text-2xl font-bold text-foreground mb-3">{item.judul || 'Tanpa judul'}</h3>
-                        <div className="flex flex-wrap gap-1.5 mb-4">
-                          {kats.map(k => (
-                            <Badge key={k} variant="secondary" className="font-medium px-2 py-0.5">
-                              {KATEGORI_LABEL[k as keyof typeof KATEGORI_LABEL]}
-                            </Badge>
-                          ))}
-                        </div>
-                        {item.deskripsi && <p className="text-base text-muted-foreground leading-relaxed mb-6">{item.deskripsi}</p>}
-                      </div>
-                      <div className="mt-4 pt-4 border-t border-border/50">
-                        <Button 
-                          onClick={() => { setOpenArtefak(item); setOpenKategori(null); }}
-                          className="w-full sm:w-auto flex items-center justify-center gap-2"
-                          size="lg"
-                        >
-                          <Folder className="w-5 h-5" /> Buka File Artefak ({files.length})
-                        </Button>
+                    {/* Bagian Atas: Judul & Kategori (Tengah) */}
+                    <div className="p-6 md:px-8 border-b border-border/50 text-center bg-muted/5">
+                      <h3 className="text-xl sm:text-2xl font-bold text-foreground mb-3">{item.judul || 'Tanpa judul'}</h3>
+                      <div className="flex flex-wrap justify-center gap-1.5">
+                        {kats.map(k => (
+                          <Badge key={k} variant="secondary" className="font-medium px-3 py-1 text-xs">
+                            {KATEGORI_LABEL[k as keyof typeof KATEGORI_LABEL]}
+                          </Badge>
+                        ))}
                       </div>
                     </div>
 
-                    {/* Kolom Kanan: Analisis Pembelajaran (Model Accordion) */}
-                    <div className="p-6 md:p-8 flex-1 md:w-1/2 bg-muted/10">
-                      <h4 className="font-semibold text-lg text-foreground mb-5 flex items-center gap-2">
-                        <FileSearch className="w-5 h-5 text-primary" /> Analisis Pembelajaran
-                      </h4>
+                    {/* Bagian Bawah: Dibagi Kiri dan Kanan */}
+                    <div className="flex flex-col md:flex-row flex-1">
                       
-                      {hasAnalisis ? (
-                        <Accordion type="single" collapsible className="w-full">
-                          {ANALISIS_FIELDS.map(f => {
-                            const val = (item as any)[f.key];
-                            if (!val) return null;
-                            return (
-                              <AccordionItem key={f.key} value={f.key} className="border-b-primary/10 border-b last:border-b-0">
-                                <AccordionTrigger className="py-3 hover:no-underline text-left">
-                                  <div className="flex items-center gap-2 font-medium text-sm sm:text-base">
-                                    <f.icon className="w-4 h-4 text-primary" /> {f.label}
-                                  </div>
-                                </AccordionTrigger>
-                                <AccordionContent className="text-sm sm:text-base text-foreground/85 leading-relaxed whitespace-pre-line pb-4 pt-1">
-                                  {val}
-                                </AccordionContent>
-                              </AccordionItem>
-                            );
-                          })}
-                        </Accordion>
-                      ) : (
-                        <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground opacity-60 py-8">
-                          <FileText className="w-12 h-12 mb-3 opacity-20" />
-                          <p className="text-sm">Belum ada catatan analisis untuk artefak ini.</p>
+                      {/* Kolom Kiri: Informasi Artefak & File */}
+                      <div className="p-6 md:p-8 flex-1 md:w-1/2 border-b md:border-b-0 md:border-r border-border flex flex-col">
+                        <h4 className="font-semibold text-lg text-foreground mb-4 flex items-center gap-2">
+                          <FileText className="w-5 h-5 text-primary" /> Deskripsi Artefak
+                        </h4>
+                        <div className="flex-1">
+                          {item.deskripsi ? (
+                            <p className="text-base text-muted-foreground leading-relaxed mb-6">{item.deskripsi}</p>
+                          ) : (
+                            <p className="text-base text-muted-foreground italic mb-6">Tidak ada deskripsi untuk artefak ini.</p>
+                          )}
                         </div>
-                      )}
+                        <div className="mt-auto pt-4 border-t border-border/50">
+                          <Button 
+                            onClick={() => { setOpenArtefak(item); setOpenKategori(null); }}
+                            className="w-full flex items-center justify-center gap-2 shadow-sm"
+                            size="lg"
+                          >
+                            <Folder className="w-5 h-5" /> Buka File Artefak ({files.length})
+                          </Button>
+                        </div>
+                      </div>
+
+                      {/* Kolom Kanan: Analisis Pembelajaran (Model Accordion) */}
+                      <div className="p-6 md:p-8 flex-1 md:w-1/2 bg-muted/10">
+                        <h4 className="font-semibold text-lg text-foreground mb-5 flex items-center gap-2">
+                          <FileSearch className="w-5 h-5 text-primary" /> Analisis Pembelajaran
+                        </h4>
+                        
+                        {hasAnalisis ? (
+                          <Accordion type="single" collapsible className="w-full">
+                            {ANALISIS_FIELDS.map(f => {
+                              const val = (item as any)[f.key];
+                              if (!val) return null;
+                              return (
+                                <AccordionItem key={f.key} value={f.key} className="border-b-primary/10 border-b last:border-b-0">
+                                  <AccordionTrigger className="py-3 hover:no-underline text-left">
+                                    <div className="flex items-center gap-2 font-medium text-sm sm:text-base">
+                                      <f.icon className="w-4 h-4 text-primary" /> {f.label}
+                                    </div>
+                                  </AccordionTrigger>
+                                  <AccordionContent className="text-sm sm:text-base text-foreground/85 leading-relaxed whitespace-pre-line pb-4 pt-1">
+                                    {val}
+                                  </AccordionContent>
+                                </AccordionItem>
+                              );
+                            })}
+                          </Accordion>
+                        ) : (
+                          <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground opacity-60 py-8">
+                            <FileText className="w-12 h-12 mb-3 opacity-20" />
+                            <p className="text-sm">Belum ada catatan analisis untuk artefak ini.</p>
+                          </div>
+                        )}
+                      </div>
+                      
                     </div>
-                    
                   </motion.div>
                 );
               })}
@@ -422,8 +432,6 @@ const PortfolioShowcase = ({ data, themeId, themeOverrides }: Props) => {
           </div>
         </section>
       )}
-
-      {/* LAMPIRAN PENILAIAN — disembunyikan dari preview publik */}
 
       {/* FOOTER */}
       <footer className="py-10 px-6 text-center bg-foreground text-background">
