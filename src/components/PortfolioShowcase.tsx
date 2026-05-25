@@ -64,7 +64,7 @@ const PortfolioShowcase = ({ data, themeId, themeOverrides }: Props) => {
     <div style={themeToStyle(theme, themeOverrides)} data-uppercase-headings={uppercase ? 'true' : 'false'} className="portfolio-themed min-h-screen bg-background text-foreground w-full max-w-full overflow-x-hidden">
       
       {/* KODE NAVBAR MULAI DARI SINI */}
-      <nav className="sticky top-0 z-50 w-full backdrop-blur-xl bg-background/70 border-b border-primary/10 shadow-sm transition-all duration-300">
+      <nav className="fixed top-0 left-0 z-50 w-full backdrop-blur-xl bg-background/70 border-b border-primary/10 shadow-sm transition-all duration-300">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16 sm:h-20">
             {/* Logo / Nama Lengkap */}
@@ -122,7 +122,7 @@ const PortfolioShowcase = ({ data, themeId, themeOverrides }: Props) => {
       {/* KODE NAVBAR SELESAI */}
 
       {/* HERO BERANDA */}
-      <section id="beranda" className="showcase-hero text-primary-foreground py-12 sm:py-24 px-4 sm:px-6">
+      <section id="beranda" className="showcase-hero text-primary-foreground pt-28 pb-12 sm:pt-36 sm:pb-24 px-4 sm:px-6">
         <div className="max-w-4xl mx-auto text-center">
           <motion.div initial="hidden" animate="visible" variants={fadeUp}>
             {p.foto_url && (
@@ -434,6 +434,8 @@ const PortfolioShowcase = ({ data, themeId, themeOverrides }: Props) => {
           </div>
         </section>
       )}
+
+      {/* LAMPIRAN PENILAIAN — disembunyikan dari preview publik */}
 
       {/* FOOTER */}
       <footer className="py-10 px-6 text-center bg-foreground text-background">
