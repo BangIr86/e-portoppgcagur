@@ -7,7 +7,6 @@ import {
   FileSearch, FlaskConical, Award, Star, ChevronRight, ArrowLeft, ExternalLink, Folder, Menu, X
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import PdfViewer from '@/components/PdfViewer';
@@ -167,7 +166,6 @@ const PortfolioShowcase = ({ data, themeId, themeOverrides }: Props) => {
       )}
 
       {/* PROFIL — STORYTELLING */}
-      {/* scroll-mt-20 ditetapkan agar kandungan tidak terpotong navbar nipis */}
       <section id="profil" className="scroll-mt-20 py-10 sm:py-16 px-4 sm:px-6 bg-muted/30">
         <div className="max-w-3xl mx-auto">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
@@ -218,68 +216,79 @@ const PortfolioShowcase = ({ data, themeId, themeOverrides }: Props) => {
         </div>
       </section>
 
-      {/* ARTEFAK MENGAJAR */}
-      {/* scroll-mt-20 ditetapkan agar kandungan tidak terpotong navbar nipis */}
+      {/* ARTEFAK MENGAJAR & ANALISIS - Desain Sejajar Baru */}
       {a.length > 0 && (
         <section id="artefak" className="scroll-mt-20 py-10 sm:py-16 px-4 sm:px-6">
-          <div className="max-w-5xl mx-auto">
+          <div className="max-w-6xl mx-auto">
             <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
-              <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-2 text-center">Artefak Mengajar</h2>
-              <p className="text-sm text-muted-foreground text-center mb-8 sm:mb-12">Dokumentasi karya pembelajaran</p>
+              <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-2 text-center">Artefak Mengajar & Analisis</h2>
+              <p className="text-sm text-muted-foreground text-center mb-8 sm:mb-12">Dokumentasi karya dan analisis pembelajaran</p>
             </motion.div>
 
-            <motion.div className="grid grid-cols-1 sm:grid-cols-2 gap-5 auto-rows-fr" variants={staggerContainer} initial="hidden" whileInView="visible" viewport={{ once: true }}>
+            <motion.div className="space-y-8" variants={staggerContainer} initial="hidden" whileInView="visible" viewport={{ once: true }}>
               {a.map(item => {
                 const files = item.files && item.files.length
                   ? item.files
                   : (item.file_url ? [{ id: 'legacy', file_url: item.file_url, file_type: item.file_type, youtube_url: item.youtube_url }] : []);
-                const primary = files[0];
                 const kats = item.kategoris && item.kategoris.length ? item.kategoris : [item.kategori];
+                const hasAnalisis = ANALISIS_FIELDS.some(f => (item as any)[f.key]);
+
                 return (
-                  <motion.div key={item.id} variants={fadeUp} className="h-full">
-                    <button
-                      type="button"
-                      onClick={() => { setOpenArtefak(item); setOpenKategori(null); }}
-                      className="text-left rounded-xl bg-card border card-shadow overflow-hidden h-full w-full flex flex-col hover:shadow-lg hover:-translate-y-0.5 transition-all focus:outline-none focus:ring-2 focus:ring-primary/40"
-                    >
-                      <div className="aspect-video w-full bg-muted/30 shrink-0 relative">
-                        {primary?.file_type === 'youtube' && primary?.youtube_url && (
-                          <img
-                            src={`https://img.youtube.com/vi/${primary.youtube_url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([a-zA-Z0-9_-]{11})/)?.[1] || ''}/hqdefault.jpg`}
-                            alt={item.judul} className="w-full h-full object-cover" />
-                        )}
-                        {primary?.file_type === 'image' && primary?.file_url && (
-                          <img src={primary.file_url} alt={item.judul} className="w-full h-full object-cover" />
-                        )}
-                        {primary?.file_type === 'pdf' && primary?.file_url && (
-                          <div className="w-full h-full relative pointer-events-none">
-                            <iframe src={`${primary.file_url}#toolbar=0&navpanes=0&view=FitH`} className="w-full h-full" title={item.judul} />
-                          </div>
-                        )}
-                        {!primary && (
-                          <div className="w-full h-full flex items-center justify-center text-muted-foreground/50">
-                            <FileText className="w-10 h-10" />
-                          </div>
-                        )}
-                        {files.length > 1 && (
-                          <div className="absolute top-2 right-2 px-2 py-1 rounded-full bg-background/90 text-foreground text-xs font-semibold shadow">
-                            {files.length} file
-                          </div>
-                        )}
-                      </div>
-                      <div className="p-4 flex-1 flex flex-col gap-2">
-                        <p className="font-semibold text-foreground">{item.judul || 'Tanpa judul'}</p>
-                        <div className="flex flex-wrap gap-1">
+                  <motion.div key={item.id} variants={fadeUp} className="bg-card border card-shadow rounded-2xl overflow-hidden flex flex-col md:flex-row">
+                    
+                    {/* Kolom Kiri: Informasi Artefak */}
+                    <div className="p-6 md:p-8 flex-1 md:w-1/2 border-b md:border-b-0 md:border-r border-border flex flex-col">
+                      <div className="flex-1">
+                        <h3 className="text-xl sm:text-2xl font-bold text-foreground mb-3">{item.judul || 'Tanpa judul'}</h3>
+                        <div className="flex flex-wrap gap-1.5 mb-4">
                           {kats.map(k => (
-                            <Badge key={k} variant="secondary" className="text-[10px] font-normal">{KATEGORI_LABEL[k as keyof typeof KATEGORI_LABEL]}</Badge>
+                            <Badge key={k} variant="secondary" className="font-medium px-2 py-0.5">
+                              {KATEGORI_LABEL[k as keyof typeof KATEGORI_LABEL]}
+                            </Badge>
                           ))}
                         </div>
-                        {item.deskripsi && <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">{item.deskripsi}</p>}
-                        <div className="mt-auto pt-2 text-xs text-primary font-medium inline-flex items-center gap-1">
-                          Lihat detail <ChevronRight className="w-3 h-3" />
-                        </div>
+                        {item.deskripsi && <p className="text-base text-muted-foreground leading-relaxed mb-6">{item.deskripsi}</p>}
                       </div>
-                    </button>
+                      <div className="mt-4 pt-4 border-t border-border/50">
+                        <Button 
+                          onClick={() => { setOpenArtefak(item); setOpenKategori(null); }}
+                          className="w-full sm:w-auto flex items-center justify-center gap-2"
+                          size="lg"
+                        >
+                          <Folder className="w-5 h-5" /> Buka File Artefak ({files.length})
+                        </Button>
+                      </div>
+                    </div>
+
+                    {/* Kolom Kanan: Analisis Pembelajaran */}
+                    <div className="p-6 md:p-8 flex-1 md:w-1/2 bg-muted/10">
+                      <h4 className="font-semibold text-lg text-foreground mb-5 flex items-center gap-2">
+                        <FileSearch className="w-5 h-5 text-primary" /> Analisis Pembelajaran
+                      </h4>
+                      
+                      {hasAnalisis ? (
+                        <div className="space-y-5">
+                          {ANALISIS_FIELDS.map(f => {
+                            const val = (item as any)[f.key];
+                            if (!val) return null;
+                            return (
+                              <div key={f.key} className="border-l-2 border-primary/40 pl-4">
+                                <h5 className="font-semibold text-sm text-foreground mb-1.5 flex items-center gap-2">
+                                  <f.icon className="w-4 h-4 text-primary" /> {f.label}
+                                </h5>
+                                <p className="text-sm sm:text-base text-foreground/85 leading-relaxed whitespace-pre-line">{val}</p>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      ) : (
+                        <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground opacity-60 py-8">
+                          <FileText className="w-12 h-12 mb-3 opacity-20" />
+                          <p className="text-sm">Belum ada catatan analisis untuk artefak ini.</p>
+                        </div>
+                      )}
+                    </div>
+                    
                   </motion.div>
                 );
               })}
@@ -292,39 +301,11 @@ const PortfolioShowcase = ({ data, themeId, themeOverrides }: Props) => {
               onSelectKategori={setOpenKategori}
               onBack={() => setOpenKategori(null)}
             />
-
-            <Accordion type="multiple" className="space-y-3">
-              {a.map(item => (
-                <AccordionItem key={item.id} value={item.id} className="border rounded-xl bg-card card-shadow data-[state=open]:shadow-md">
-                  <AccordionTrigger className="px-5 py-4 hover:no-underline">
-                    <div className="text-left flex-1 min-w-0">
-                      <p className="font-semibold text-foreground truncate">{item.judul || 'Artefak tanpa judul'}</p>
-                      <p className="text-xs text-muted-foreground truncate">{(item.kategoris && item.kategoris.length ? item.kategoris : [item.kategori]).map(k => KATEGORI_LABEL[k as keyof typeof KATEGORI_LABEL]).join(' • ')}</p>
-                    </div>
-                  </AccordionTrigger>
-                  <AccordionContent className="px-5 pb-5 space-y-5">
-                    {ANALISIS_FIELDS.map(f => {
-                      const val = (item as any)[f.key];
-                      if (!val) return null;
-                      return (
-                        <div key={f.key} className="border-l-2 border-primary/40 pl-4">
-                          <h4 className="font-semibold text-foreground mb-1.5 flex items-center gap-2">
-                            <f.icon className="w-4 h-4 text-primary" /> {f.label}
-                          </h4>
-                          <p className="text-sm sm:text-base text-foreground/85 leading-relaxed whitespace-pre-line">{val}</p>
-                        </div>
-                      );
-                    })}
-                  </AccordionContent>
-                </AccordionItem>
-              ))}
-            </Accordion>
           </div>
         </section>
       )}
 
       {/* REFLEKSI DIRI */}
-      {/* scroll-mt-20 ditetapkan agar kandungan tidak terpotong navbar nipis */}
       {(r.pengalaman_mengajar || r.kekuatan_diri || r.kelemahan_diri || r.rencana_tindak_lanjut || r.filosofi_mengajar) && (
         <section id="refleksi" className="scroll-mt-20 py-10 sm:py-16 px-4 sm:px-6">
           <div className="max-w-4xl mx-auto">
@@ -372,7 +353,6 @@ const PortfolioShowcase = ({ data, themeId, themeOverrides }: Props) => {
       )}
 
       {/* MODEL GURU */}
-      {/* scroll-mt-20 ditetapkan agar kandungan tidak terpotong navbar nipis */}
       {(m.visi || m.misi || m.kompetensi.length > 0 || m.karakter.length > 0) && (
         <section id="model-guru" className="scroll-mt-20 py-10 sm:py-16 px-4 sm:px-6 bg-muted/30">
           <div className="max-w-5xl mx-auto">
@@ -438,8 +418,6 @@ const PortfolioShowcase = ({ data, themeId, themeOverrides }: Props) => {
           </div>
         </section>
       )}
-
-      {/* LAMPIRAN PENILAIAN — disembunyikan dari preview publik */}
 
       {/* FOOTER */}
       <footer className="py-10 px-6 text-center bg-foreground text-background">
