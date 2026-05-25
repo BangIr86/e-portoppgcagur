@@ -4,7 +4,7 @@ import { PortfolioData, KATEGORI_LABEL, ArtefakItem } from '@/contexts/Portfolio
 import {
   AlertTriangle, BookOpen, CheckCircle, RefreshCw, FileText, Image as ImageIcon, GraduationCap,
   ChevronDown, Heart, TrendingUp, AlertCircle as AlertCircleIcon, Target, Sparkles, Quote, MapPin,
-  FileSearch, FlaskConical, Award, Star, ChevronRight, ArrowLeft, ExternalLink, Folder,
+  FileSearch, FlaskConical, Award, Star, ChevronRight, ArrowLeft, ExternalLink, Folder, Menu, X
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
@@ -44,34 +44,80 @@ const PortfolioShowcase = ({ data, themeId, themeOverrides }: Props) => {
 
   const [openArtefak, setOpenArtefak] = useState<ArtefakItem | null>(null);
   const [openKategori, setOpenKategori] = useState<string | null>(null);
+  
+  // State untuk Menu HP (Mobile)
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // Lampiran 7 & 8 highlight
   const lampiran7 = data.lampiran.filter(l => l.tipe === 'lampiran7');
   const lampiran8 = data.lampiran.filter(l => l.tipe === 'lampiran8');
   const lampiranOther = data.lampiran.filter(l => !['lampiran7', 'lampiran8'].includes(l.tipe));
 
+  const navLinks = [
+    { name: 'Profil', href: '#profil' },
+    { name: 'Artefak', href: '#artefak' },
+    { name: 'Refleksi', href: '#refleksi' },
+    { name: 'Model Guru', href: '#model-guru' },
+  ];
+
   return (
     <div style={themeToStyle(theme, themeOverrides)} data-uppercase-headings={uppercase ? 'true' : 'false'} className="portfolio-themed min-h-screen bg-background text-foreground w-full max-w-full overflow-x-hidden">
       
       {/* KODE NAVBAR MULAI DARI SINI */}
-      <nav className="sticky top-0 z-50 w-full backdrop-blur-md bg-background/80 border-b border-border shadow-sm">
+      <nav className="sticky top-0 z-50 w-full backdrop-blur-xl bg-background/70 border-b border-primary/10 shadow-sm transition-all duration-300">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
+          <div className="flex items-center justify-between h-16 sm:h-20">
+            {/* Logo / Nama Lengkap */}
             <div className="flex-shrink-0">
-              <a href="#beranda" className="font-bold text-xl text-primary tracking-tight">
-                {p.full_name ? p.full_name.split(' ')[0] : 'E-Porto'}
+              <a href="#beranda" className="font-bold text-xl sm:text-2xl tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-primary to-violet-500 hover:opacity-80 transition-opacity">
+                {p.full_name || 'E-Porto'}
               </a>
             </div>
+            
+            {/* Navigasi Desktop */}
             <div className="hidden md:block">
-              <div className="ml-10 flex items-baseline space-x-6">
-                <a href="#profil" className="text-foreground/80 hover:text-primary transition-colors px-3 py-2 rounded-md text-sm font-medium">Profil</a>
-                <a href="#artefak" className="text-foreground/80 hover:text-primary transition-colors px-3 py-2 rounded-md text-sm font-medium">Artefak</a>
-                <a href="#refleksi" className="text-foreground/80 hover:text-primary transition-colors px-3 py-2 rounded-md text-sm font-medium">Refleksi</a>
-                <a href="#model-guru" className="text-foreground/80 hover:text-primary transition-colors px-3 py-2 rounded-md text-sm font-medium">Model Guru</a>
+              <div className="ml-10 flex items-center space-x-2">
+                {navLinks.map((link) => (
+                  <a 
+                    key={link.name}
+                    href={link.href} 
+                    className="relative group px-4 py-2 rounded-full text-sm font-medium text-foreground/80 hover:text-primary hover:bg-primary/5 transition-all duration-300"
+                  >
+                    {link.name}
+                    {/* Animasi garis bawah elegan */}
+                    <span className="absolute inset-x-4 bottom-1 h-0.5 bg-primary transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300 rounded-full"></span>
+                  </a>
+                ))}
               </div>
+            </div>
+
+            {/* Tombol Menu Mobile */}
+            <div className="md:hidden flex items-center">
+              <button 
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                className="text-foreground/80 hover:text-primary p-2 focus:outline-none transition-colors"
+              >
+                {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              </button>
             </div>
           </div>
         </div>
+
+        {/* Menu Dropdown Mobile */}
+        {isMobileMenuOpen && (
+          <div className="md:hidden absolute top-full left-0 w-full bg-background border-b border-primary/10 shadow-lg py-2 px-4 flex flex-col space-y-1 slide-in-top">
+            {navLinks.map((link) => (
+              <a 
+                key={link.name}
+                href={link.href}
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="block px-4 py-3 rounded-lg text-base font-medium text-foreground/80 hover:text-primary hover:bg-primary/5 transition-colors"
+              >
+                {link.name}
+              </a>
+            ))}
+          </div>
+        )}
       </nav>
       {/* KODE NAVBAR SELESAI */}
 
@@ -388,8 +434,6 @@ const PortfolioShowcase = ({ data, themeId, themeOverrides }: Props) => {
           </div>
         </section>
       )}
-
-      {/* LAMPIRAN PENILAIAN — disembunyikan dari preview publik */}
 
       {/* FOOTER */}
       <footer className="py-10 px-6 text-center bg-foreground text-background">
