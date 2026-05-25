@@ -7,6 +7,7 @@ import {
   FileSearch, FlaskConical, Award, Star, ChevronRight, ArrowLeft, ExternalLink, Folder, Menu, X
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import PdfViewer from '@/components/PdfViewer';
@@ -62,7 +63,7 @@ const PortfolioShowcase = ({ data, themeId, themeOverrides }: Props) => {
   return (
     <div style={themeToStyle(theme, themeOverrides)} data-uppercase-headings={uppercase ? 'true' : 'false'} className="portfolio-themed min-h-screen bg-background text-foreground w-full max-w-full overflow-x-hidden">
       
-      {/* KODE NAVBAR DI SINI - Ketinggian diturunkan ke h-14 */}
+      {/* KODE NAVBAR */}
       <nav className="fixed top-0 left-0 z-40 w-full backdrop-blur-xl bg-background/70 border-b border-primary/10 shadow-sm transition-all duration-300">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-14">
@@ -118,9 +119,8 @@ const PortfolioShowcase = ({ data, themeId, themeOverrides }: Props) => {
           </div>
         )}
       </nav>
-      {/* KODE NAVBAR SELESAI */}
 
-      {/* HERO BERANDA - Jarak padding dilaraskan semula */}
+      {/* HERO BERANDA */}
       <section id="beranda" className="showcase-hero text-primary-foreground pt-24 pb-12 sm:pt-28 sm:pb-24 px-4 sm:px-6">
         <div className="max-w-4xl mx-auto text-center">
           <motion.div initial="hidden" animate="visible" variants={fadeUp}>
@@ -216,7 +216,7 @@ const PortfolioShowcase = ({ data, themeId, themeOverrides }: Props) => {
         </div>
       </section>
 
-      {/* ARTEFAK MENGAJAR & ANALISIS - Desain Sejajar Baru */}
+      {/* ARTEFAK MENGAJAR & ANALISIS - Desain Accordion Klik-untuk-Buka */}
       {a.length > 0 && (
         <section id="artefak" className="scroll-mt-20 py-10 sm:py-16 px-4 sm:px-6">
           <div className="max-w-6xl mx-auto">
@@ -260,27 +260,31 @@ const PortfolioShowcase = ({ data, themeId, themeOverrides }: Props) => {
                       </div>
                     </div>
 
-                    {/* Kolom Kanan: Analisis Pembelajaran */}
+                    {/* Kolom Kanan: Analisis Pembelajaran (Model Accordion) */}
                     <div className="p-6 md:p-8 flex-1 md:w-1/2 bg-muted/10">
                       <h4 className="font-semibold text-lg text-foreground mb-5 flex items-center gap-2">
                         <FileSearch className="w-5 h-5 text-primary" /> Analisis Pembelajaran
                       </h4>
                       
                       {hasAnalisis ? (
-                        <div className="space-y-5">
+                        <Accordion type="single" collapsible className="w-full">
                           {ANALISIS_FIELDS.map(f => {
                             const val = (item as any)[f.key];
                             if (!val) return null;
                             return (
-                              <div key={f.key} className="border-l-2 border-primary/40 pl-4">
-                                <h5 className="font-semibold text-sm text-foreground mb-1.5 flex items-center gap-2">
-                                  <f.icon className="w-4 h-4 text-primary" /> {f.label}
-                                </h5>
-                                <p className="text-sm sm:text-base text-foreground/85 leading-relaxed whitespace-pre-line">{val}</p>
-                              </div>
+                              <AccordionItem key={f.key} value={f.key} className="border-b-primary/10 border-b last:border-b-0">
+                                <AccordionTrigger className="py-3 hover:no-underline text-left">
+                                  <div className="flex items-center gap-2 font-medium text-sm sm:text-base">
+                                    <f.icon className="w-4 h-4 text-primary" /> {f.label}
+                                  </div>
+                                </AccordionTrigger>
+                                <AccordionContent className="text-sm sm:text-base text-foreground/85 leading-relaxed whitespace-pre-line pb-4 pt-1">
+                                  {val}
+                                </AccordionContent>
+                              </AccordionItem>
                             );
                           })}
-                        </div>
+                        </Accordion>
                       ) : (
                         <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground opacity-60 py-8">
                           <FileText className="w-12 h-12 mb-3 opacity-20" />
@@ -418,6 +422,8 @@ const PortfolioShowcase = ({ data, themeId, themeOverrides }: Props) => {
           </div>
         </section>
       )}
+
+      {/* LAMPIRAN PENILAIAN — disembunyikan dari preview publik */}
 
       {/* FOOTER */}
       <footer className="py-10 px-6 text-center bg-foreground text-background">
