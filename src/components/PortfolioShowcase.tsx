@@ -44,14 +44,7 @@ const PortfolioShowcase = ({ data, themeId, themeOverrides }: Props) => {
 
   const [openArtefak, setOpenArtefak] = useState<ArtefakItem | null>(null);
   const [openKategori, setOpenKategori] = useState<string | null>(null);
-  
-  // State untuk Menu HP (Mobile)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
-  // Lampiran 7 & 8 highlight
-  const lampiran7 = data.lampiran.filter(l => l.tipe === 'lampiran7');
-  const lampiran8 = data.lampiran.filter(l => l.tipe === 'lampiran8');
-  const lampiranOther = data.lampiran.filter(l => !['lampiran7', 'lampiran8'].includes(l.tipe));
 
   const navLinks = [
     { name: 'Profil', href: '#profil' },
@@ -63,7 +56,7 @@ const PortfolioShowcase = ({ data, themeId, themeOverrides }: Props) => {
   return (
     <div style={themeToStyle(theme, themeOverrides)} data-uppercase-headings={uppercase ? 'true' : 'false'} className="portfolio-themed min-h-screen bg-background text-foreground w-full max-w-full overflow-x-hidden">
       
-      {/* KODE NAVBAR */}
+      {/* NAVBAR */}
       <nav className="fixed top-0 left-0 z-40 w-full backdrop-blur-xl bg-background/70 border-b border-primary/10 shadow-sm transition-all duration-300">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-14">
@@ -72,27 +65,18 @@ const PortfolioShowcase = ({ data, themeId, themeOverrides }: Props) => {
                 E-Portofolio
               </a>
             </div>
-            
             <div className="hidden md:block">
               <div className="ml-10 flex items-center space-x-2">
                 {navLinks.map((link) => (
-                  <a 
-                    key={link.name}
-                    href={link.href} 
-                    className="relative group px-4 py-2 rounded-full text-sm font-medium text-foreground/80 hover:text-primary hover:bg-primary/5 transition-all duration-300"
-                  >
+                  <a key={link.name} href={link.href} className="relative group px-4 py-2 rounded-full text-sm font-medium text-foreground/80 hover:text-primary hover:bg-primary/5 transition-all duration-300">
                     {link.name}
                     <span className="absolute inset-x-4 bottom-1 h-0.5 bg-primary transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300 rounded-full"></span>
                   </a>
                 ))}
               </div>
             </div>
-
             <div className="md:hidden flex items-center">
-              <button 
-                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="text-foreground/80 hover:text-primary p-2 focus:outline-none transition-colors"
-              >
+              <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="text-foreground/80 hover:text-primary p-2 focus:outline-none transition-colors">
                 {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
               </button>
             </div>
@@ -115,13 +99,11 @@ const PortfolioShowcase = ({ data, themeId, themeOverrides }: Props) => {
         )}
       </nav>
 
-      {/* HERO BERANDA */}
+      {/* HERO SECTION */}
       <section id="beranda" className="showcase-hero text-primary-foreground pt-24 pb-12 sm:pt-28 sm:pb-24 px-4 sm:px-6">
         <div className="max-w-4xl mx-auto text-center">
           <motion.div initial="hidden" animate="visible" variants={fadeUp}>
-            {p.foto_url && (
-              <img src={p.foto_url} alt={p.full_name} className="w-24 h-24 sm:w-32 sm:h-32 rounded-full mx-auto mb-5 sm:mb-6 border-4 border-primary-foreground/30 object-cover" />
-            )}
+            {p.foto_url && <img src={p.foto_url} alt={p.full_name} className="w-24 h-24 sm:w-32 sm:h-32 rounded-full mx-auto mb-5 sm:mb-6 border-4 border-primary-foreground/30 object-cover" />}
             <p className="text-xs sm:text-sm uppercase tracking-widest opacity-80 mb-2">Mahasiswa PPG Prajabatan Informatika</p>
             <h1 className="text-3xl sm:text-5xl md:text-6xl font-bold mb-4 break-words">{p.full_name || 'Nama Mahasiswa'}</h1>
             {(p.asal_daerah || p.asal_kampus) && (
@@ -211,109 +193,107 @@ const PortfolioShowcase = ({ data, themeId, themeOverrides }: Props) => {
         </div>
       </section>
 
-      {/* ARTEFAK MENGAJAR & ANALISIS */}
+      {/* ARTEFAK SECTION DENGAN LIST KATEGORI & ANALISIS SEJAJAR */}
       {a.length > 0 && (
         <section id="artefak" className="scroll-mt-20 py-10 sm:py-16 px-4 sm:px-6">
           <div className="max-w-6xl mx-auto">
             <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
-              <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-2 text-center">Artefak Mengajar & Analisis</h2>
-              <p className="text-sm text-muted-foreground text-center mb-8 sm:mb-12">Dokumentasi karya dan analisis pembelajaran</p>
+              <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-12 text-center">Artefak Mengajar & Analisis</h2>
             </motion.div>
 
             <motion.div className="space-y-10" variants={staggerContainer} initial="hidden" whileInView="visible" viewport={{ once: true }}>
               {a.map(item => {
-                const files = item.files && item.files.length
-                  ? item.files
-                  : (item.file_url ? [{ id: 'legacy', file_url: item.file_url, file_type: item.file_type, youtube_url: item.youtube_url }] : []);
+                const kats = (item.kategoris && item.kategoris.length > 0) 
+                  ? item.kategoris 
+                  : (item.kategori ? [item.kategori] : []);
                 const hasAnalisis = ANALISIS_FIELDS.some(f => (item as any)[f.key]);
 
                 return (
                   <motion.div key={item.id} variants={fadeUp} className="bg-card border card-shadow rounded-2xl overflow-hidden flex flex-col">
                     
-                    {/* Bagian Atas: Judul Saja (Tengah) */}
+                    {/* Bagian Atas: Judul Tengah */}
                     <div className="p-6 md:px-8 border-b border-border/50 text-center bg-muted/5">
                       <h3 className="text-xl sm:text-2xl font-bold text-foreground">{item.judul || 'Tanpa judul'}</h3>
                     </div>
 
-                    {/* Bagian Bawah: Dibagi Kiri dan Kanan */}
+                    {/* Bagian Bawah: Dibagi Kiri dan Kanan dengan proporsi sama rata (Simetris) */}
                     <div className="flex flex-col md:flex-row flex-1">
                       
-                      {/* Kolom Kiri: Artefak Pembelajaran (List File Langsung) */}
-                      <div className="p-6 md:p-8 flex-1 md:w-1/2 border-b md:border-b-0 md:border-r border-border flex flex-col">
-                        <h4 className="font-semibold text-lg text-foreground mb-4 flex items-center gap-2">
+                      {/* Kolom Kiri: Artefak Pembelajaran */}
+                      <div className="p-6 md:p-8 w-full md:w-1/2 border-b md:border-b-0 md:border-r border-border flex flex-col">
+                        <h4 className="font-semibold text-lg text-foreground mb-5 flex items-center gap-2">
                           <Folder className="w-5 h-5 text-primary" /> Artefak Pembelajaran
                         </h4>
-                        <div className="flex-1 flex flex-col gap-3">
-                          {files.length > 0 ? (
-                            files.map((f: any, i: number) => (
-                              <div key={f.id || i} className="flex items-center justify-between p-3.5 rounded-xl border border-border/60 bg-background hover:bg-muted/40 transition-all shadow-sm">
-                                <div className="flex items-center gap-3 min-w-0">
-                                  <div className="w-9 h-9 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
-                                    {f.file_type === 'image' ? <ImageIcon className="w-4 h-4" /> :
-                                     f.file_type === 'youtube' ? <span className="text-red-500 font-bold text-xs">▶</span> :
-                                     <FileText className="w-4 h-4" />}
-                                  </div>
-                                  <span className="text-sm sm:text-base font-medium text-foreground truncate">
-                                    {f.label || `File Artefak ${i + 1}`}
-                                  </span>
-                                </div>
-                                {(f.file_url || f.youtube_url) && (
-                                  <a href={f.file_url || f.youtube_url} target="_blank" rel="noopener noreferrer"
-                                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-xs font-semibold hover:bg-primary/90 transition-colors shrink-0 shadow-sm">
-                                    Buka <ExternalLink className="w-3 h-3" />
-                                  </a>
-                                )}
-                              </div>
+                        <div className="space-y-3 flex-1">
+                          {kats.length > 0 ? (
+                            kats.map((k, idx) => (
+                              <button 
+                                key={`${k}-${idx}`}
+                                onClick={() => { setOpenArtefak(item); setOpenKategori(k); }}
+                                className="w-full flex items-center justify-between p-4 rounded-xl border border-border/60 bg-background hover:bg-primary/5 transition-all shadow-sm group"
+                              >
+                                <span className="text-sm sm:text-base font-medium">
+                                  {KATEGORI_LABEL[k as keyof typeof KATEGORI_LABEL] || 'Dokumen Artefak'}
+                                </span>
+                                <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
+                              </button>
                             ))
+                          ) : (
+                            <button 
+                              onClick={() => { setOpenArtefak(item); setOpenKategori(null); }}
+                              className="w-full flex items-center justify-between p-4 rounded-xl border border-border/60 bg-background hover:bg-primary/5 transition-all shadow-sm group"
+                            >
+                              <span className="text-sm sm:text-base font-medium">Buka File Artefak</span>
+                              <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
+                            </button>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Kolom Kanan: Analisis Pembelajaran */}
+                      <div className="p-6 md:p-8 w-full md:w-1/2 bg-muted/10 flex flex-col">
+                        <h4 className="font-semibold text-lg text-foreground mb-5 flex items-center gap-2">
+                          <FileSearch className="w-5 h-5 text-primary" /> Analisis Pembelajaran
+                        </h4>
+                        <div className="flex-1">
+                          {hasAnalisis ? (
+                            <Accordion type="single" collapsible className="w-full">
+                              {ANALISIS_FIELDS.map(f => {
+                                const val = (item as any)[f.key];
+                                if (!val) return null;
+                                
+                                const IconComponent = f.icon;
+                                
+                                return (
+                                  <AccordionItem key={f.key} value={f.key} className="border-b-primary/10 border-b last:border-b-0">
+                                    <AccordionTrigger className="py-3 hover:no-underline text-left">
+                                      <div className="flex items-center gap-2 font-medium text-sm sm:text-base">
+                                        <IconComponent className="w-4 h-4 text-primary" /> {f.label}
+                                      </div>
+                                    </AccordionTrigger>
+                                    <AccordionContent className="text-sm sm:text-base text-foreground/85 leading-relaxed whitespace-pre-line pb-4 pt-1">
+                                      {val}
+                                    </AccordionContent>
+                                  </AccordionItem>
+                                );
+                              })}
+                            </Accordion>
                           ) : (
                             <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground opacity-60 py-8">
                               <FileText className="w-12 h-12 mb-3 opacity-20" />
-                              <p className="text-sm">Belum ada file untuk artefak ini.</p>
+                              <p className="text-sm">Belum ada catatan analisis untuk artefak ini.</p>
                             </div>
                           )}
                         </div>
                       </div>
 
-                      {/* Kolom Kanan: Analisis Pembelajaran (Model Accordion) */}
-                      <div className="p-6 md:p-8 flex-1 md:w-1/2 bg-muted/10">
-                        <h4 className="font-semibold text-lg text-foreground mb-5 flex items-center gap-2">
-                          <FileSearch className="w-5 h-5 text-primary" /> Analisis Pembelajaran
-                        </h4>
-                        
-                        {hasAnalisis ? (
-                          <Accordion type="single" collapsible className="w-full">
-                            {ANALISIS_FIELDS.map(f => {
-                              const val = (item as any)[f.key];
-                              if (!val) return null;
-                              return (
-                                <AccordionItem key={f.key} value={f.key} className="border-b-primary/10 border-b last:border-b-0">
-                                  <AccordionTrigger className="py-3 hover:no-underline text-left">
-                                    <div className="flex items-center gap-2 font-medium text-sm sm:text-base">
-                                      <f.icon className="w-4 h-4 text-primary" /> {f.label}
-                                    </div>
-                                  </AccordionTrigger>
-                                  <AccordionContent className="text-sm sm:text-base text-foreground/85 leading-relaxed whitespace-pre-line pb-4 pt-1">
-                                    {val}
-                                  </AccordionContent>
-                                </AccordionItem>
-                              );
-                            })}
-                          </Accordion>
-                        ) : (
-                          <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground opacity-60 py-8">
-                            <FileText className="w-12 h-12 mb-3 opacity-20" />
-                            <p className="text-sm">Belum ada catatan analisis untuk artefak ini.</p>
-                          </div>
-                        )}
-                      </div>
-                      
                     </div>
                   </motion.div>
                 );
               })}
             </motion.div>
 
-            {/* Dialog Component dibiarkan di sini jika dibutuhkan tempat lain */}
+            {/* Dialog Component (Modal) */}
             <ArtefakDialog
               item={openArtefak}
               kategori={openKategori}
@@ -488,7 +468,7 @@ const ArtefakDialog = ({ item, kategori, onClose, onSelectKategori, onBack }: Ar
               <DialogTitle className="truncate">{item.judul || 'Tanpa judul'}</DialogTitle>
               <DialogDescription>
                 {kategori
-                  ? KATEGORI_LABEL[kategori as keyof typeof KATEGORI_LABEL]
+                  ? KATEGORI_LABEL[kategori as keyof typeof KATEGORI_LABEL] || 'Dokumen Artefak'
                   : `${kategoriList.length} kategori • ${files.length} file/link`}
               </DialogDescription>
             </div>
@@ -508,7 +488,7 @@ const ArtefakDialog = ({ item, kategori, onClose, onSelectKategori, onBack }: Ar
                   <Folder className="w-5 h-5" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="font-medium text-foreground">{KATEGORI_LABEL[k as keyof typeof KATEGORI_LABEL]}</p>
+                  <p className="font-medium text-foreground">{KATEGORI_LABEL[k as keyof typeof KATEGORI_LABEL] || 'Dokumen Artefak'}</p>
                   <p className="text-xs text-muted-foreground">{groups[k].length} file/link</p>
                 </div>
                 <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
