@@ -10,7 +10,6 @@ import { Badge } from '@/components/ui/badge';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import PdfViewer from '@/components/PdfViewer';
 import { getTheme, themeToStyle, injectThemeFont, resolveUppercase, type ThemeOverrides } from '@/lib/themes';
 
 const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: 'easeOut' } } };
@@ -517,8 +516,15 @@ const ArtefakDialog = ({ item, kategori, onClose, onSelectKategori, onBack }: Ar
                     <img src={f.file_url} alt={f.label || item.judul} className="w-full max-h-[60vh] object-contain bg-muted/30" />
                   </a>
                 )}
+                {/* SOLUSI PDF: Menggunakan Iframe yang otomatis convert link Google Drive */}
                 {f.file_type === 'pdf' && f.file_url && (
-                  <PdfViewer url={f.file_url} title={f.label || item.judul} />
+                  <div className="w-full h-[60vh] bg-muted/30 rounded-lg overflow-hidden border border-border">
+                    <iframe
+                      src={f.file_url.includes('drive.google.com') ? f.file_url.replace(/\/view.*/, '/preview') : f.file_url}
+                      className="w-full h-full"
+                      title={f.label || item.judul}
+                    />
+                  </div>
                 )}
                 <div className="p-3 flex items-center justify-between gap-2">
                   <div className="flex items-center gap-2 min-w-0">
